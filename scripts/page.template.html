@@ -1,0 +1,265 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>New-Gen LiDAR Spoofing Captures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --panel:#ffffff; --ink:#0f1a2a; --ink-2:#48566b; --ink-3:#7a8699;
+  --rule:#d6dce4; --scope:#090e18; --accent:#1d4ed8; --accent-ink:#ffffff;
+  --attack:#c2410c; --attack-bg:#fdeee6; --benign:#0f766e; --benign-bg:#e3f4f1;
+  --chip:#e2e7ee; --focus:#1d4ed8;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0c121c; --panel:#131b28; --ink:#e6ebf2; --ink-2:#a6b1c2; --ink-3:#77849a;
+    --rule:#243044; --scope:#05080f; --accent:#7aa2ff; --accent-ink:#0b1220;
+    --attack:#fb8a5a; --attack-bg:#3a1d12; --benign:#4fd1c0; --benign-bg:#0f2e2b;
+    --chip:#1c2636; --focus:#7aa2ff;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0c121c; --panel:#131b28; --ink:#e6ebf2; --ink-2:#a6b1c2; --ink-3:#77849a;
+  --rule:#243044; --scope:#05080f; --accent:#7aa2ff; --accent-ink:#0b1220;
+  --attack:#fb8a5a; --attack-bg:#3a1d12; --benign:#4fd1c0; --benign-bg:#0f2e2b;
+  --chip:#1c2636; --focus:#7aa2ff;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+header.top{display:grid;gap:18px;padding-bottom:26px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--display);font-stretch:78%;font-weight:750;font-size:clamp(34px,5.4vw,58px);line-height:.98;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{max-width:68ch;color:var(--ink-2);margin:0;font-size:16px}
+.paper{font-size:14px;color:var(--ink-2);margin:0}
+.paper b{color:var(--ink);font-weight:600}
+.stats{display:flex;flex-wrap:wrap;gap:10px 28px;font:500 13px/1.3 var(--mono);color:var(--ink-2)}
+.stats b{display:block;font:700 26px/1.1 var(--display);font-stretch:80%;color:var(--ink)}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+nav.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:14px;border-bottom:1px solid var(--rule)}
+nav.filters .lab{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.fg{display:flex;flex-wrap:wrap;gap:6px;margin-right:14px;align-items:center}
+button.chip{font:500 13px/1 var(--body);border:1px solid transparent;background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+
+section.set{padding-block:34px 10px;border-bottom:1px solid var(--rule)}
+.set-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:end}
+.set-head h2{font-family:var(--display);font-stretch:82%;font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.05;margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font:500 12px/1 var(--mono);padding:5px 8px;border-radius:4px;background:var(--chip);color:var(--ink-2)}
+.tag.grp{background:var(--ink);color:var(--ground)}
+.note{max-width:72ch;color:var(--ink-2);margin:12px 0 0}
+.syncbtn{font:600 13px/1 var(--body);background:var(--accent);color:var(--accent-ink);border:0;padding:10px 14px;border-radius:6px;cursor:pointer;white-space:nowrap}
+
+.caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px;margin-top:20px}
+.cap{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.cap.benign{border-top:3px solid var(--benign)}
+.cap.attack{border-top:3px solid var(--attack)}
+.cap.camera{border-top:3px solid var(--ink-3)}
+.screen{position:relative;background:var(--scope);aspect-ratio:16/10}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--scope)}
+.views{display:flex;gap:0;border-bottom:1px solid var(--rule)}
+.views button{flex:1;font:500 12px/1 var(--body);padding:9px 6px;background:transparent;border:0;border-right:1px solid var(--rule);color:var(--ink-2);cursor:pointer}
+.views button:last-child{border-right:0}
+.views button[aria-pressed="true"]{color:var(--ink);background:var(--chip);font-weight:600}
+.cap-body{padding:12px 14px 14px;display:grid;gap:10px}
+.cap-title{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:3px}
+.pill.attack{background:var(--attack-bg);color:var(--attack)}
+.pill.benign{background:var(--benign-bg);color:var(--benign)}
+.pill.camera{background:var(--chip);color:var(--ink-2)}
+.cap-title h3{font:600 15px/1.25 var(--body);margin:0}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:13px}
+dl.kv dt{color:var(--ink-3)}
+dl.kv dd{margin:0;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.file{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:10px;border-top:1px dashed var(--rule)}
+.file code{font:500 12.5px/1.3 var(--mono);overflow-wrap:anywhere;flex:1 1 180px}
+.btn{font:600 12.5px/1 var(--body);border:1px solid var(--rule);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:5px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.hash{font:400 11px/1.35 var(--mono);color:var(--ink-3);overflow-wrap:anywhere}
+.src{font:400 11.5px/1.35 var(--mono);color:var(--ink-3)}
+
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px;padding-block:36px 0}
+.about h2{font-family:var(--display);font-stretch:82%;font-size:24px;margin:0 0 10px}
+.about p,.about li{color:var(--ink-2);font-size:14px}
+.about ul{padding-left:18px;margin:0}
+pre.bib{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:12px;font:12px/1.5 var(--mono);overflow-x:auto;color:var(--ink);white-space:pre}
+figure.setup{margin:0}
+.setup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin-top:12px}
+.setup-grid img{width:100%;border-radius:6px;border:1px solid var(--rule);display:block;background:var(--panel)}
+.setup-grid figcaption{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 14px;border-radius:6px;font-size:13px}
+@media (max-width:640px){.set-head{grid-template-columns:1fr}.syncbtn{justify-self:start}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Keio University · Computing and Sensing Group · NDSS 2024</div>
+    <h1>New-Gen LiDAR Spoofing: <em>raw captures</em> of injection and removal attacks</h1>
+    <p class="lede">Velodyne packet captures (.pcap) from the physical experiments behind the paper, each paired with a video. Every capture comes with a bird’s-eye rendering made from the pcap itself; where the original VeloView screen recording or a camera view exists, it is shown alongside.</p>
+    <p class="paper"><b>LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies.</b> NDSS 2024 · <a href="https://sites.google.com/keio.jp/keio-csg/projects/new-gen-lidar-sec" target="_blank" rel="noopener">Project page</a></p>
+    <div class="stats" id="stats"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--benign)"></i>Benign capture</span>
+      <span><i class="sw" style="background:var(--attack)"></i>Attack capture</span>
+      <span><i class="sw" style="background:var(--ink-3)"></i>Camera view of the scene</span>
+      <span>CPI = Chosen Pattern Injection · PRA = Physical Removal Attack (synchronized) · HFR = High-Frequency Removal</span>
+    </div>
+  </header>
+
+  <nav class="filters" aria-label="Filter experiments">
+    <div class="fg"><span class="lab">Attack</span>
+      <button class="chip" data-f="group" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="group" data-v="CPI" aria-pressed="false">Injection (CPI)</button>
+      <button class="chip" data-f="group" data-v="Removal" aria-pressed="false">Removal (PRA / HFR)</button>
+    </div>
+    <div class="fg"><span class="lab">Scene</span>
+      <button class="chip" data-f="motion" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="motion" data-v="static" aria-pressed="false">Static</button>
+      <button class="chip" data-f="motion" data-v="dynamic" aria-pressed="false">Dynamic</button>
+    </div>
+    <div class="fg"><span class="lab">LiDAR</span>
+      <button class="chip" data-f="lidar" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="lidar" data-v="VLP-16" aria-pressed="false">VLP-16</button>
+      <button class="chip" data-f="lidar" data-v="VLP-32C" aria-pressed="false">VLP-32C</button>
+    </div>
+  </nav>
+
+  <main id="sets"></main>
+
+  <div class="about">
+    <div>
+      <h2>Using the captures</h2>
+      <ul>
+        <li>Each download is a zip holding one unmodified pcap, exactly as recorded by VeloView or Wireshark on UDP port 2368. The SHA-256 shown is that of the pcap inside.</li>
+        <li>Open them in <a href="https://www.paraview.org/veloview/" target="_blank" rel="noopener">VeloView</a>, or parse them with <code>velodyne_decoder</code> or ROS <code>velodyne_pointcloud</code>. The LiDAR model and return mode below are read from each packet’s factory bytes.</li>
+        <li>Bird’s-eye renderings are top-down views, 0.1 s per frame (one 600 rpm revolution), coloured by height. In dual-return captures only the first return of each pair is drawn.</li>
+        <li>Recorded videos are VeloView screen recordings made during the experiments; some were matched to their capture by timestamp.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="about" style="padding-top:28px">
+    <div style="grid-column:1/-1">
+      <h2>Experimental setup</h2>
+      <div class="setup-grid">
+        <figure class="setup"><img src="media/setup0.jpg" alt="Indoor spoofing setup with laser spoofer aimed at the LiDAR"><figcaption>Indoor setup</figcaption></figure>
+        <figure class="setup"><img src="media/setup1.jpg" alt="Outdoor spoofing setup in a parking lot"><figcaption>Outdoor setup</figcaption></figure>
+        <figure class="setup"><img src="media/setup2.jpg" alt="Vehicle-removal setup with a parked car in front of the LiDAR"><figcaption>Vehicle removal (HFR)</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const RELEASE_BASE = /*RELEASE_BASE*/"";
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); } for (const k of kids) if (k != null) e.append(k); return e; };
+const mb = b => (b / 1e6).toFixed(b < 1e7 ? 1 : 0) + " MB";
+const motion = s => /dynamic/i.test(s.scene) ? "dynamic" : "static";
+
+function toast(msg) { const t = el("div", { class: "toast", role: "status", text: msg }); document.body.append(t); setTimeout(() => t.remove(), 2600); }
+
+function stats() {
+  const caps = DATA.sets.flatMap(s => s.caps);
+  const bytes = caps.reduce((a, c) => a + c.bytes, 0);
+  const secs = caps.reduce((a, c) => a + c.duration, 0);
+  const items = [[DATA.sets.length, "experiments"], [caps.length, "pcap captures"], [caps.filter(c => c.role === "benign").length + " / " + caps.filter(c => c.role === "attack").length, "benign / attack"], [(bytes / 1e9).toFixed(2) + " GB", "raw pcap"], [Math.round(secs / 60) + " min", "of sensor data"]];
+  $("#stats").replaceChildren(...items.map(([v, l]) => el("div", {}, el("b", { text: String(v) }), l)));
+}
+
+function videoEl(src) {
+  const v = el("video", { src, muted: "", loop: "", playsinline: "", controls: "", preload: "metadata", poster: src.replace(/\.mp4$/, ".jpg") });
+  v.muted = true; return v;
+}
+
+function capCard(c) {
+  const card = el("article", { class: "cap " + c.role });
+  const screen = el("div", { class: "screen" });
+  const views = [];
+  if (c.video) views.push(["Recorded (VeloView)", c.video]);
+  views.push(["Rendered from pcap", c.bev]);
+  let v = videoEl(views[0][1]); screen.append(v);
+  card.append(screen);
+  if (views.length > 1) {
+    const bar = el("div", { class: "views", role: "group", "aria-label": "Video source" });
+    views.forEach(([lab, src], i) => {
+      const b = el("button", { type: "button", "aria-pressed": String(i === 0), text: lab });
+      b.onclick = () => { const playing = !v.paused; const nv = videoEl(src); v.replaceWith(nv); v = nv; card._video = () => v; bar.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); if (playing) nv.play().catch(() => {}); };
+      bar.append(b);
+    });
+    card.append(bar);
+  }
+  card._video = () => v;
+  const dl = el("dl", { class: "kv" });
+  for (const [k, val] of [["LiDAR", c.model + " · " + c.mode + " return"], ["Recorded", c.start], ["Length", c.duration.toFixed(1) + " s · " + c.packets.toLocaleString() + " packets"], ["Size", mb(c.bytes) + " pcap · " + mb(c.zip_bytes) + " zip"]]) dl.append(el("dt", { text: k }), el("dd", { text: val }));
+  const file = el("div", { class: "file" }, el("code", { text: c.file }));
+  const a = el("a", { class: "btn primary", text: "Download pcap" });
+  if (RELEASE_BASE) { a.href = RELEASE_BASE + c.zip.split("/").pop(); a.target = "_blank"; a.rel = "noopener"; }
+  else { a.setAttribute("aria-disabled", "true"); a.setAttribute("role", "link"); a.title = "The pcap archive is being uploaded to a public data host"; a.onclick = e => { e.preventDefault(); toast("Downloads open once the archive is on its public host."); }; a.tabIndex = 0; }
+  const cp = el("button", { class: "btn", type: "button", text: "Copy SHA-256" });
+  cp.onclick = () => navigator.clipboard.writeText(c.sha256).then(() => toast("SHA-256 copied"), () => toast("Copy blocked — select the hash below instead"));
+  file.append(a, cp);
+  card.append(el("div", { class: "cap-body" },
+    el("div", { class: "cap-title" }, el("span", { class: "pill " + c.role, text: c.role }), el("h3", { text: c.label })),
+    dl, file,
+    el("div", { class: "hash", text: "sha256 " + c.sha256 }),
+    c.video_source ? el("div", { class: "src", text: "Recording: " + c.video_source }) : null));
+  return card;
+}
+
+function cameraCard(cam) {
+  const card = el("article", { class: "cap camera" });
+  const screen = el("div", { class: "screen" }); const v = videoEl(cam.video); screen.append(v); card.append(screen);
+  card._video = () => v;
+  card.append(el("div", { class: "cap-body" },
+    el("div", { class: "cap-title" }, el("span", { class: "pill camera", text: "camera" }), el("h3", { text: "Scene camera" })),
+    el("div", { class: "src", text: "Source: " + cam.source + " (not time-aligned to the captures)" })));
+  return card;
+}
+
+function render() {
+  const main = $("#sets");
+  for (const s of DATA.sets) {
+    const sec = el("section", { class: "set", id: s.id, "data-group": s.group, "data-lidar": s.lidar, "data-motion": motion(s) });
+    const hasB = s.caps.some(c => c.role === "benign");
+    const sync = el("button", { class: "syncbtn", type: "button", text: "Play all together" });
+    sec.append(el("div", { class: "set-head" },
+      el("div", {}, el("h2", { text: s.title }),
+        el("div", { class: "meta" }, el("span", { class: "tag grp", text: s.group === "CPI" ? "Injection · CPI" : "Removal" }), el("span", { class: "tag", text: s.lidar }), el("span", { class: "tag", text: s.scene }), el("span", { class: "tag", text: s.date }), hasB ? null : el("span", { class: "tag", text: "attack only" }))),
+      sync));
+    sec.append(el("p", { class: "note", text: s.note }));
+    const grid = el("div", { class: "caps" });
+    const order = { benign: 0, attack: 1 };
+    const cards = [...s.caps].sort((a, b) => order[a.role] - order[b.role]).map(capCard);
+    if (s.camera) cards.unshift(cameraCard(s.camera));
+    grid.append(...cards); sec.append(grid);
+    sync.onclick = () => { const vs = cards.map(c => c._video()); const go = vs.some(v => v.paused); vs.forEach(v => { if (go) { v.currentTime = 0; v.play().catch(() => {}); } else v.pause(); }); sync.textContent = go ? "Pause all" : "Play all together"; };
+    main.append(sec);
+  }
+}
+
+const state = { group: "all", motion: "all", lidar: "all" };
+document.querySelectorAll("button.chip").forEach(b => b.onclick = () => {
+  state[b.dataset.f] = b.dataset.v;
+  document.querySelectorAll(`button.chip[data-f="${b.dataset.f}"]`).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  document.querySelectorAll("section.set").forEach(s => { s.hidden = !Object.entries(state).every(([k, v]) => v === "all" || s.dataset[k] === v); });
+});
+stats(); render();
+</script>
