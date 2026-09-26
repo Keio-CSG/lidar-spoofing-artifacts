@@ -21,7 +21,7 @@ release/                   one zip per pcap (not in git; attached to the GitHub 
 ```
 pip install numpy pillow imageio-ffmpeg
 python scripts/build.py                 # all experiments (or pass experiment ids)
-python scripts/build_page.py [BASE_URL] # BASE_URL + "<file>.zip" becomes each download link
+python scripts/build_page.py [BASE_URL] [--ga G-XXXX]  # BASE_URL + "<file>.zip" becomes each download link; --ga adds GA4
 ```
 
 Each zip contains a single unmodified pcap; the SHA-256 on the site is that of the pcap.
