@@ -1,8 +1,13 @@
-# New-Gen LiDAR Spoofing — raw captures
+# LiDAR spoofing — raw captures
 
 Velodyne VLP-16 / VLP-32C packet captures (pcap) and videos from the physical experiments in
-*LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies* (NDSS 2024):
-Chosen Pattern Injection (CPI), the synchronized Physical Removal Attack (PRA), and High-Frequency Removal (HFR), in static and dynamic scenes, with benign references where they were recorded.
+
+- *LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies* (NDSS 2024) —
+  Chosen Pattern Injection (CPI), the synchronized Physical Removal Attack (PRA) and High-Frequency Removal (HFR), in static and dynamic scenes
+- *On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance* (NDSS 2025) —
+  injection against a vehicle-mounted VLP-32C driving past the Moving Vehicle Spoofing (MVS) system
+
+Benign references are included where they were recorded.
 
 ## Layout
 
@@ -21,11 +26,12 @@ release/                   one zip per pcap (not in git; attached to the GitHub 
 ```
 pip install numpy pillow imageio-ffmpeg
 python scripts/build.py                 # all experiments (or pass experiment ids)
-python scripts/build_page.py [BASE_URL] [--ga G-XXXX]  # BASE_URL + "<file>.zip" becomes each download link; --ga adds GA4
+python scripts/build_page.py --repo https://github.com/Keio-CSG/lidar-spoofing-artifacts --ga G-QYEN5RGBVF
+                                        # --repo enables download links (<repo>/releases/download/<tag>/<file>.zip)
 ```
 
 Each zip contains a single unmodified pcap; the SHA-256 on the site is that of the pcap.
 
 ## Downloads
 
-All pcaps are attached to the [v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/v1.0). Browse them with videos at https://keio-csg.github.io/lidar-spoofing-artifacts/.
+NDSS 2024 pcaps: [v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/v1.0). NDSS 2025 pcaps: [ndss25-v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/ndss25-v1.0). Browse them with videos at https://keio-csg.github.io/lidar-spoofing-artifacts/.

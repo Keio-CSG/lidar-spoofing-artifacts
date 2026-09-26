@@ -41,8 +41,9 @@ header.top{display:grid;gap:18px;padding-bottom:26px;border-bottom:1px solid var
 h1{font-family:var(--display);font-stretch:78%;font-weight:750;font-size:clamp(34px,5.4vw,58px);line-height:.98;margin:0;letter-spacing:-.01em;text-wrap:balance}
 h1 em{font-style:normal;color:var(--accent)}
 .lede{max-width:68ch;color:var(--ink-2);margin:0;font-size:16px}
-.paper{font-size:14px;color:var(--ink-2);margin:0}
-.paper b{color:var(--ink);font-weight:600}
+.papers{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px;color:var(--ink-2)}
+.papers b{color:var(--ink);font-weight:600}
+.papers .ptag{font:600 11px/1 var(--mono);background:var(--ink);color:var(--ground);padding:4px 6px;border-radius:3px;margin-right:8px;vertical-align:1px}
 .stats{display:flex;flex-wrap:wrap;gap:10px 28px;font:500 13px/1.3 var(--mono);color:var(--ink-2)}
 .stats b{display:block;font:700 26px/1.1 var(--display);font-stretch:80%;color:var(--ink)}
 
@@ -110,10 +111,10 @@ figure.setup{margin:0}
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">Keio University · Computing and Sensing Group · NDSS 2024</div>
-    <h1>New-Gen LiDAR Spoofing: <em>raw captures</em> of injection and removal attacks</h1>
-    <p class="lede">Velodyne packet captures (.pcap) from the physical experiments behind the paper, each paired with a video. Every capture comes with a bird’s-eye rendering made from the pcap itself; where the original VeloView screen recording or a camera view exists, it is shown alongside.</p>
-    <p class="paper"><b>LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies.</b> NDSS 2024 · <a href="https://sites.google.com/keio.jp/keio-csg/projects/new-gen-lidar-sec" target="_blank" rel="noopener">Project page</a></p>
+    <div class="eyebrow">Keio University · Computing and Sensing Group · NDSS 2024 / 2025</div>
+    <h1>LiDAR spoofing: <em>raw captures</em> of injection and removal attacks</h1>
+    <p class="lede">Velodyne VLP-16 / VLP-32C packet captures (.pcap) from the physical experiments behind two papers, each paired with a video. Every capture comes with a bird’s-eye rendering made from the pcap itself; where the original VeloView screen recording or a camera view exists, it is shown alongside.</p>
+    <ul class="papers" id="papers"></ul>
     <div class="stats" id="stats"></div>
     <div class="legend">
       <span><i class="sw" style="background:var(--benign)"></i>Benign capture</span>
@@ -124,6 +125,11 @@ figure.setup{margin:0}
   </header>
 
   <nav class="filters" aria-label="Filter experiments">
+    <div class="fg"><span class="lab">Paper</span>
+      <button class="chip" data-f="paper" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="paper" data-v="ndss24" aria-pressed="false">NDSS 2024</button>
+      <button class="chip" data-f="paper" data-v="ndss25" aria-pressed="false">NDSS 2025</button>
+    </div>
     <div class="fg"><span class="lab">Attack</span>
       <button class="chip" data-f="group" data-v="all" aria-pressed="true">All</button>
       <button class="chip" data-f="group" data-v="CPI" aria-pressed="false">Injection (CPI)</button>
@@ -156,7 +162,7 @@ figure.setup{margin:0}
   </div>
   <div class="about" style="padding-top:28px">
     <div style="grid-column:1/-1">
-      <h2>Experimental setup</h2>
+      <h2>Experimental setup (NDSS 2024)</h2>
       <div class="setup-grid">
         <figure class="setup"><img src="media/setup0.jpg" alt="Indoor spoofing setup with laser spoofer aimed at the LiDAR"><figcaption>Indoor setup</figcaption></figure>
         <figure class="setup"><img src="media/setup1.jpg" alt="Outdoor spoofing setup in a parking lot"><figcaption>Outdoor setup</figcaption></figure>
@@ -168,7 +174,7 @@ figure.setup{margin:0}
 
 <script>
 const DATA = /*DATA*/null;
-const RELEASE_BASE = /*RELEASE_BASE*/"";
+const REPO = /*REPO*/"";
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); } for (const k of kids) if (k != null) e.append(k); return e; };
 const mb = b => (b / 1e6).toFixed(b < 1e7 ? 1 : 0) + " MB";
@@ -189,7 +195,7 @@ function videoEl(src) {
   v.muted = true; return v;
 }
 
-function capCard(c) {
+function capCard(c, s) {
   const card = el("article", { class: "cap " + c.role });
   const screen = el("div", { class: "screen" });
   const views = [];
@@ -211,7 +217,7 @@ function capCard(c) {
   for (const [k, val] of [["LiDAR", c.model + " · " + c.mode + " return"], ["Recorded", c.start], ["Length", c.duration.toFixed(1) + " s · " + c.packets.toLocaleString() + " packets"], ["Size", mb(c.bytes) + " pcap · " + mb(c.zip_bytes) + " zip"]]) dl.append(el("dt", { text: k }), el("dd", { text: val }));
   const file = el("div", { class: "file" }, el("code", { text: c.file }));
   const a = el("a", { class: "btn primary", text: "Download pcap" });
-  if (RELEASE_BASE) { a.href = RELEASE_BASE + c.zip.split("/").pop(); a.target = "_blank"; a.rel = "noopener"; }
+  if (REPO) { a.href = REPO + "/releases/download/" + DATA.papers[s.paper].release + "/" + c.zip.split("/").pop(); a.target = "_blank"; a.rel = "noopener"; }
   else { a.setAttribute("aria-disabled", "true"); a.setAttribute("role", "link"); a.title = "The pcap archive is being uploaded to a public data host"; a.onclick = e => { e.preventDefault(); toast("Downloads open once the archive is on its public host."); }; a.tabIndex = 0; }
   const cp = el("button", { class: "btn", type: "button", text: "Copy SHA-256" });
   cp.onclick = () => navigator.clipboard.writeText(c.sha256).then(() => toast("SHA-256 copied"), () => toast("Copy blocked — select the hash below instead"));
@@ -224,42 +230,46 @@ function capCard(c) {
   return card;
 }
 
-function cameraCard(cam) {
+function cameraCard(cam, aligned) {
   const card = el("article", { class: "cap camera" });
   const screen = el("div", { class: "screen" }); const v = videoEl(cam.video); screen.append(v); card.append(screen);
   card._video = () => v;
   card.append(el("div", { class: "cap-body" },
     el("div", { class: "cap-title" }, el("span", { class: "pill camera", text: "camera" }), el("h3", { text: "Scene camera" })),
-    el("div", { class: "src", text: "Source: " + cam.source + " (not time-aligned to the captures)" })));
+    el("div", { class: "src", text: "Source: " + cam.source + (aligned ? "" : " (not time-aligned to the captures)") })));
   return card;
 }
 
 function render() {
   const main = $("#sets");
   for (const s of DATA.sets) {
-    const sec = el("section", { class: "set", id: s.id, "data-group": s.group, "data-lidar": s.lidar, "data-motion": motion(s) });
+    const sec = el("section", { class: "set", id: s.id, "data-paper": s.paper, "data-group": s.group, "data-lidar": s.lidar, "data-motion": motion(s) });
     const hasB = s.caps.some(c => c.role === "benign");
     const sync = el("button", { class: "syncbtn", type: "button", text: "Play all together" });
     sec.append(el("div", { class: "set-head" },
       el("div", {}, el("h2", { text: s.title }),
-        el("div", { class: "meta" }, el("span", { class: "tag grp", text: s.group === "CPI" ? "Injection · CPI" : "Removal" }), el("span", { class: "tag", text: s.lidar }), el("span", { class: "tag", text: s.scene }), el("span", { class: "tag", text: s.date }), hasB ? null : el("span", { class: "tag", text: "attack only" }))),
+        el("div", { class: "meta" }, el("span", { class: "tag grp", text: DATA.papers[s.paper].short }), el("span", { class: "tag", text: s.group === "CPI" ? "Injection · CPI" : "Removal" }), el("span", { class: "tag", text: s.lidar }), el("span", { class: "tag", text: s.scene }), el("span", { class: "tag", text: s.date }), s.caps.length === 0 ? el("span", { class: "tag", text: "video only" }) : hasB ? null : el("span", { class: "tag", text: "attack only" }))),
       sync));
     sec.append(el("p", { class: "note", text: s.note }));
     const grid = el("div", { class: "caps" });
     const order = { benign: 0, attack: 1 };
-    const cards = [...s.caps].sort((a, b) => order[a.role] - order[b.role]).map(capCard);
-    if (s.camera) cards.unshift(cameraCard(s.camera));
+    const cards = [...s.caps].sort((a, b) => order[a.role] - order[b.role]).map(c => capCard(c, s));
+    (s.cameras || []).slice().reverse().forEach(cam => cards.unshift(cameraCard(cam, /starts two seconds/.test(s.note))));
     grid.append(...cards); sec.append(grid);
     sync.onclick = () => { const vs = cards.map(c => c._video()); const go = vs.some(v => v.paused); vs.forEach(v => { if (go) { v.currentTime = 0; v.play().catch(() => {}); } else v.pause(); }); sync.textContent = go ? "Pause all" : "Play all together"; };
     main.append(sec);
   }
 }
 
-const state = { group: "all", motion: "all", lidar: "all" };
+const state = { paper: "all", group: "all", motion: "all", lidar: "all" };
 document.querySelectorAll("button.chip").forEach(b => b.onclick = () => {
   state[b.dataset.f] = b.dataset.v;
   document.querySelectorAll(`button.chip[data-f="${b.dataset.f}"]`).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
   document.querySelectorAll("section.set").forEach(s => { s.hidden = !Object.entries(state).every(([k, v]) => v === "all" || s.dataset[k] === v); });
 });
-stats(); render();
+function papers() {
+  $("#papers").replaceChildren(...Object.values(DATA.papers).map(p => el("li", {}, el("span", { class: "ptag", text: p.short }), el("b", { text: p.title }),
+    p.url ? " · " : null, p.url ? el("a", { href: p.url, target: "_blank", rel: "noopener", text: "Project page" }) : null)));
+}
+papers(); stats(); render();
 </script>

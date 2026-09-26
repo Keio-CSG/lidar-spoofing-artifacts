@@ -2,7 +2,7 @@ import os, re, sys, json, struct, hashlib, zipfile, subprocess, datetime
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 sys.path.insert(0, os.path.dirname(__file__))
-from manifest import SETS, SETUP_IMAGES
+from manifest import SETS, SETUP_IMAGES, PAPERS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -100,13 +100,20 @@ def transcode(src, dst, width, crf=31, max_s=None):
     subprocess.run([FF, "-v", "error", "-y", "-ss", "3", "-i", dst, "-frames:v", "1", "-q:v", "4", dst.replace(".mp4", ".jpg")], check=True)
 
 def main(only=None):
-    data = {"generated": datetime.date.today().isoformat(), "sets": []}
+    dj = os.path.join(SITE, "data.json")
+    prev = {s["id"]: s for s in json.load(open(dj, encoding="utf-8"))["sets"]} if only and os.path.exists(dj) else {}
+    data = {"generated": datetime.date.today().isoformat(), "papers": PAPERS, "sets": []}
     for S in SETS:
-        if only and S["id"] not in only: continue
-        sd = dict({k: v for k, v in S.items() if k not in ("caps", "camera")}, caps=[])
-        if S.get("camera"):
-            fn = f"{S['id']}__camera.mp4"; transcode(S["camera"], os.path.join(MEDIA, fn), 720, crf=32)
-            sd["camera"] = {"video": "media/" + fn, "source": os.path.basename(S["camera"])}
+        if only and S["id"] not in only:
+            if S["id"] in prev:
+                o = dict(prev[S["id"]], paper=S["paper"]); c = o.pop("camera", None)
+                o.setdefault("cameras", [c] if c else []); data["sets"].append(o)
+            continue
+        sd = dict({k: v for k, v in S.items() if k not in ("caps", "camera")}, caps=[], cameras=[])
+        cams = S.get("camera") or []
+        for j, cam in enumerate([cams] if isinstance(cams, str) else cams):
+            fn = f"{S['id']}__camera{j or ''}.mp4"; transcode(cam, os.path.join(MEDIA, fn), 720, crf=32)
+            sd["cameras"].append({"video": "media/" + fn, "source": os.path.basename(cam)})
         os.makedirs(os.path.join(REL, S["id"]), exist_ok=True)
         for c in S["caps"]:
             name = os.path.splitext(os.path.basename(c["pcap"]))[0].strip().replace("&", "and").replace(" ", "_")
@@ -127,6 +134,7 @@ def main(only=None):
                 fn = f"{S['id']}__{slug(name)}__rec.mp4"; transcode(c["video"], os.path.join(MEDIA, fn), 960)
                 info["video"] = "media/" + fn; info["video_source"] = os.path.basename(c["video"])
             sd["caps"].append(info)
+            del raw, pls
         data["sets"].append(sd)
     for i, s in enumerate(SETUP_IMAGES):
         im = Image.open(s).convert("RGB"); im.thumbnail((1200, 1200)); im.save(os.path.join(MEDIA, f"setup{i}.jpg"), quality=80)

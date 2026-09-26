@@ -1,5 +1,17 @@
 {
  "generated": "2026-09-26",
+ "papers": {
+  "ndss24": {
+   "short": "NDSS 2024",
+   "release": "v1.0",
+   "title": "LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies"
+  },
+  "ndss25": {
+   "short": "NDSS 2025",
+   "release": "ndss25-v1.0",
+   "title": "On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance"
+  }
+ },
  "sets": [
   {
    "id": "cpi-text-ieeesp",
@@ -28,7 +40,9 @@
      "video": "media/cpi-text-ieeesp__ieeesandp__rec.mp4",
      "video_source": "IEEES&P.mp4"
     }
-   ]
+   ],
+   "paper": "ndss24",
+   "cameras": []
   },
   {
    "id": "cpi-text-oakland",
@@ -57,7 +71,9 @@
      "video": "media/cpi-text-oakland__oakland__rec.mp4",
      "video_source": "oakland.mp4"
     }
-   ]
+   ],
+   "paper": "ndss24",
+   "cameras": []
   },
   {
    "id": "cpi-3d-objects",
@@ -170,7 +186,9 @@
      "zip_bytes": 12020698,
      "bev": "media/cpi-3d-objects__real-car-copy-4m-2__bev.mp4"
     }
-   ]
+   ],
+   "paper": "ndss24",
+   "cameras": []
   },
   {
    "id": "cpi-walking",
@@ -233,7 +251,9 @@
      "video": "media/cpi-walking__2022-11-12-14-11-50-velodyne-vlp-16-data-wall-op-5v__rec.mp4",
      "video_source": "VeloView 4.1.3 64-bit 2022-11-12 14-12-14.mp4"
     }
-   ]
+   ],
+   "paper": "ndss24",
+   "cameras": []
   },
   {
    "id": "rm-human-room-vlp32c",
@@ -315,10 +335,13 @@
      "video_source": "HFR_human.mp4"
     }
    ],
-   "camera": {
-    "video": "media/rm-human-room-vlp32c__camera.mp4",
-    "source": "human_remove_camera.MOV"
-   }
+   "paper": "ndss24",
+   "cameras": [
+    {
+     "video": "media/rm-human-room-vlp32c__camera.mp4",
+     "source": "human_remove_camera.MOV"
+    }
+   ]
   },
   {
    "id": "rm-human-corridor-vlp16",
@@ -378,10 +401,13 @@
      "bev": "media/rm-human-corridor-vlp16__hfa-remove-human__bev.mp4"
     }
    ],
-   "camera": {
-    "video": "media/rm-human-corridor-vlp16__camera.mp4",
-    "source": "20220810_180944.mp4"
-   }
+   "paper": "ndss24",
+   "cameras": [
+    {
+     "video": "media/rm-human-corridor-vlp16__camera.mp4",
+     "source": "20220810_180944.mp4"
+    }
+   ]
   },
   {
    "id": "rm-car-outdoor-vlp16",
@@ -426,7 +452,9 @@
      "zip_bytes": 81946848,
      "bev": "media/rm-car-outdoor-vlp16__car-remove__bev.mp4"
     }
-   ]
+   ],
+   "paper": "ndss24",
+   "cameras": []
   },
   {
    "id": "rm-human-outdoor-vlp16",
@@ -454,10 +482,301 @@
      "bev": "media/rm-human-outdoor-vlp16__human-remove-dual__bev.mp4"
     }
    ],
-   "camera": {
-    "video": "media/rm-human-outdoor-vlp16__camera.mp4",
-    "source": "20220810_164402.mp4"
-   }
+   "paper": "ndss24",
+   "cameras": [
+    {
+     "video": "media/rm-human-outdoor-vlp16__camera.mp4",
+     "source": "20220810_164402.mp4"
+    }
+   ]
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-wall-40kmh",
+   "group": "CPI",
+   "title": "Ghost-wall injection at 40 km/h",
+   "lidar": "VLP-32C",
+   "scene": "Test track, dynamic",
+   "date": "2024-03-13",
+   "note": "The VLP-32C rides on a vehicle driving towards the roadside MVS system, which tracks the LiDAR and injects a ghost wall ahead of the vehicle. The camera clip starts two seconds before the capture.",
+   "caps": [
+    {
+     "role": "attack",
+     "label": "Synchronized injection · 40 km/h",
+     "file": "2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.pcap",
+     "bytes": 69707096,
+     "sha256": "d6370639d7aad651b2c00ba1b4eee9cc44d479c14419d4230a99b5535687ef46",
+     "packets": 55148,
+     "start": "2024-03-13 16:41:17",
+     "duration": 18.3,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-03-13-K2実験/2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.pcap",
+     "zip": "mvs-wall-40kmh/2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.zip",
+     "zip_bytes": 31171102,
+     "bev": "media/mvs-wall-40kmh__2024-03-13-16-41-02-velodyne-vlp-32c-data-injection__bev.mp4"
+    }
+   ],
+   "cameras": [
+    {
+     "video": "media/mvs-wall-40kmh__camera.mp4",
+     "source": "CPI_40kph.MOV"
+    }
+   ]
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-wall-30kmh",
+   "group": "CPI",
+   "title": "Ghost-wall injection at 30 km/h",
+   "lidar": "VLP-32C",
+   "scene": "Test track, dynamic",
+   "date": "2024-03-15",
+   "note": "Same setup as the 40 km/h run, with the vehicle at 30 km/h.",
+   "caps": [
+    {
+     "role": "attack",
+     "label": "Synchronized injection · 30 km/h",
+     "file": "2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.pcap",
+     "bytes": 163758808,
+     "sha256": "be6bf6bcef8df2b0b4896044609d8bd09d10144a5edab2715bb450cfa8b232a3",
+     "packets": 129556,
+     "start": "2024-03-15 16:44:21",
+     "duration": 21.5,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "LiDARデータ/2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.pcap",
+     "zip": "mvs-wall-30kmh/2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.zip",
+     "zip_bytes": 38892973,
+     "bev": "media/mvs-wall-30kmh__2024-03-15-16-44-06-velodyne-vlp-32c-data-experiment1-wall-30km__bev.mp4"
+    }
+   ],
+   "cameras": []
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-injection-runs",
+   "group": "CPI",
+   "title": "Injection runs on the test track",
+   "lidar": "VLP-32C",
+   "scene": "Test track, dynamic",
+   "date": "2024-04-10",
+   "note": "Six consecutive injection runs against the vehicle-mounted VLP-32C. Run speeds were not recorded in the file names.",
+   "caps": [
+    {
+     "role": "attack",
+     "label": "Injection run 1",
+     "file": "vlp32c_20240410_CPItest.pcap",
+     "bytes": 464341800,
+     "sha256": "ff04979821d65e4698377f8022b6a30c1c7eddbd10fad81b6d22814f263c87d1",
+     "packets": 367359,
+     "start": "2024-04-10 15:44:36",
+     "duration": 121.9,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest.zip",
+     "zip_bytes": 209613292,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injection run 2",
+     "file": "vlp32c_20240410_CPItest_2.pcap",
+     "bytes": 173116200,
+     "sha256": "daa92df96d5f55a5d5797e9cd5d2d8d3969c43015ea5c46854ced1ee9ba7bb74",
+     "packets": 136959,
+     "start": "2024-04-10 15:52:21",
+     "duration": 45.4,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest_2.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_2.zip",
+     "zip_bytes": 79482980,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-2__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injection run 3",
+     "file": "vlp32c_20240410_CPItest_3.pcap",
+     "bytes": 150762360,
+     "sha256": "f32852485352535936c7334669451d9a2a550956db9116582af204a1c2965fba",
+     "packets": 119274,
+     "start": "2024-04-10 16:22:12",
+     "duration": 39.6,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest_3.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_3.zip",
+     "zip_bytes": 68581404,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-3__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injection run 4",
+     "file": "vlp32c_20240410_CPItest_4.pcap",
+     "bytes": 133872792,
+     "sha256": "9d489d802e280583accbc875af96b0c2d7afd8b59dda56b327f7571e7d3790f2",
+     "packets": 105912,
+     "start": "2024-04-10 16:33:18",
+     "duration": 35.1,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest_4.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_4.zip",
+     "zip_bytes": 60462008,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-4__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injection run 5",
+     "file": "vlp32c_20240410_CPItest_5.pcap",
+     "bytes": 111350840,
+     "sha256": "2468cfbfba1fcf5b93d5b3d97b73c966046a287473fc177bdc3c38387f26a460",
+     "packets": 88094,
+     "start": "2024-04-10 16:45:35",
+     "duration": 29.2,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest_5.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_5.zip",
+     "zip_bytes": 50383911,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-5__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injection run 6",
+     "file": "vlp32c_20240410_CPItest_6.pcap",
+     "bytes": 105296280,
+     "sha256": "53c3fb49b85f2661bbeb6b92e10678ed2eb67fa396c18178682727126f25e832",
+     "packets": 83304,
+     "start": "2024-04-10 16:46:26",
+     "duration": 27.6,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-10-K2/vlp32c_20240410_CPItest_6.pcap",
+     "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_6.zip",
+     "zip_bytes": 47470503,
+     "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-6__bev.mp4"
+    }
+   ],
+   "cameras": []
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-cart-injection",
+   "group": "CPI",
+   "title": "Injection against a moving LiDAR on a cart",
+   "lidar": "VLP-32C",
+   "scene": "Outdoor, dynamic",
+   "date": "2024-02-08",
+   "note": "An early outdoor test of the auto-aiming spoofer: the VLP-32C is pushed on a cart towards the MVS system.",
+   "caps": [
+    {
+     "role": "attack",
+     "label": "Injection with auto-aiming",
+     "file": "2024-02-08-vlp32c-2.pcap",
+     "bytes": 114986104,
+     "sha256": "65007ece3e60587b0ece4c810ad06572e11e14f315ec6eb8801934cec2c05765",
+     "packets": 90970,
+     "start": "2024-02-08 17:24:44",
+     "duration": 30.2,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "cpi/2024-02-08-vlp32c-2.pcap",
+     "zip": "mvs-cart-injection/2024-02-08-vlp32c-2.zip",
+     "zip_bytes": 34332395,
+     "bev": "media/mvs-cart-injection__2024-02-08-vlp32c-2__bev.mp4"
+    }
+   ],
+   "cameras": [
+    {
+     "video": "media/mvs-cart-injection__camera.mp4",
+     "source": "cpi_1.MOV"
+    },
+    {
+     "video": "media/mvs-cart-injection__camera1.mp4",
+     "source": "cpi_2.MOV"
+    }
+   ]
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-indoor-car",
+   "group": "CPI",
+   "title": "Indoor injection of a captured car",
+   "lidar": "VLP-32C",
+   "scene": "Indoor, static",
+   "date": "2024-03-22 / 04-04",
+   "note": "A real car and a real pedestrian are first captured with the VLP-32C; the car trace is then injected as a spoofed vehicle. The captures of the real objects are the benign references.",
+   "caps": [
+    {
+     "role": "benign",
+     "label": "Real car (source trace)",
+     "file": "2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.pcap",
+     "bytes": 426822488,
+     "sha256": "8bb1c7de75a25f22d2cde803591ef73092331ab6ca9ce08899f3a62f88aecbed",
+     "packets": 337676,
+     "start": "2024-03-22 16:30:03",
+     "duration": 115.8,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "Velodyne VLP-32c/2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.pcap",
+     "zip": "mvs-indoor-car/2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.zip",
+     "zip_bytes": 198394518,
+     "bev": "media/mvs-indoor-car__2024-03-22-16-30-00-velodyne-vlp-32c-data-real-car-capture__bev.mp4"
+    },
+    {
+     "role": "benign",
+     "label": "Real pedestrian (source trace)",
+     "file": "2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.pcap",
+     "bytes": 200111448,
+     "sha256": "d3e9ed73b531e3dffd7cd7d6c835574752dc86964cea47014977b27061324cef",
+     "packets": 158316,
+     "start": "2024-03-22 16:33:23",
+     "duration": 54.2,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "Velodyne VLP-32c/2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.pcap",
+     "zip": "mvs-indoor-car/2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.zip",
+     "zip_bytes": 89888791,
+     "bev": "media/mvs-indoor-car__2024-03-22-16-33-21-velodyne-vlp-32c-data-real-pedestrian-capture__bev.mp4"
+    },
+    {
+     "role": "attack",
+     "label": "Injected car",
+     "file": "2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.pcap",
+     "bytes": 32972728,
+     "sha256": "1c44979c9c36c6c91d427630b2b3fefe706c678d11459f59924f0cbd20ba156e",
+     "packets": 26086,
+     "start": "2024-04-04 19:39:58",
+     "duration": 8.7,
+     "model": "VLP-32C",
+     "mode": "dual",
+     "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.pcap",
+     "zip": "mvs-indoor-car/2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.zip",
+     "zip_bytes": 12748193,
+     "bev": "media/mvs-indoor-car__2024-04-04-19-39-48-velodyne-vlp-32c-data-indoor-car-injection__bev.mp4"
+    }
+   ],
+   "cameras": []
+  },
+  {
+   "paper": "ndss25",
+   "id": "mvs-autoware",
+   "group": "Removal",
+   "title": "End-to-end attack on an Autoware vehicle",
+   "lidar": "VLP-32C",
+   "scene": "Outdoor, dynamic",
+   "date": "2024-08",
+   "note": "PIXKIT with a VLP-32C, driven by Autoware.ai, benign vs. under attack (paper Fig. 16). Only the video is available; the LiDAR data of this run was not archived as pcap.",
+   "caps": [],
+   "cameras": [
+    {
+     "video": "media/mvs-autoware__camera.mp4",
+     "source": "autoware.mp4"
+    }
+   ]
   }
  ]
 }
