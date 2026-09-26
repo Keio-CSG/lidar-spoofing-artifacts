@@ -2,7 +2,9 @@ import os, re, sys, json, struct, hashlib, zipfile, subprocess, datetime
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 sys.path.insert(0, os.path.dirname(__file__))
-from manifest import SETS, SETUP_IMAGES, PAPERS
+from manifest import SETS, SETUP_IMAGES, PAPERS, AT128_CORR
+from hesai import load_at128_corr, xt32_points, at128_points
+_AT = {}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -20,17 +22,30 @@ REC = np.dtype([("d", "<u2"), ("i", "u1")])
 
 def slug(s): return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
+PAYLOAD = {1206: "vlp", 1080: "xt32", 1118: "at128"}
+
 def read_pcap(path):
     raw = open(path, "rb").read()
     h = hashlib.sha256(raw).hexdigest()
-    off = 24; ts = []; pls = []
+    off = 24; ts = []; pls = []; kind = None
     while off + 16 <= len(raw):
         s, us, incl, _ = struct.unpack_from("<IIII", raw, off); off += 16
-        if incl == 1248: ts.append(s + us / 1e6); pls.append(raw[off + 42: off + 1248])
+        k = PAYLOAD.get(incl - 42)
+        if k and k != "vlp" and raw[off + 42: off + 44] != b"\xee\xff": k = None  # Hesai pre-header
+        if k and (kind is None or k == kind):
+            kind = kind or k; ts.append(s + us / 1e6); pls.append(raw[off + 42: off + incl])
         off += incl
-    return raw, h, np.array(ts), pls
+    return raw, h, np.array(ts), pls, kind
+
+def describe(kind, pl):
+    if kind == "vlp": return MODEL.get(pl[1205], hex(pl[1205])), RMODE.get(pl[1204], hex(pl[1204]))
+    return {"xt32": "XT32", "at128": "AT128"}[kind], ("dual" if pl[10] == 2 else "single")
 
 def points(pl):
+    if len(pl) == 1080: return xt32_points(pl)
+    if len(pl) == 1118:
+        if "c" not in _AT: _AT["c"] = load_at128_corr(AT128_CORR)
+        return at128_points(pl, _AT["c"])
     pid, dual = pl[1205], pl[1204] == 0x39
     el = EL16 if pid == 0x22 else EL32; sc = 0.002 if pid == 0x22 else 0.004
     out = []
@@ -55,7 +70,7 @@ def colorize(z):
     return (CM[i] * (1 - f) + CM[i + 1] * f).astype(np.uint8)
 
 FONT = ImageFont.truetype("C:/Windows/Fonts/consola.ttf", 14)
-W_, H_ = 800, 500
+W_, H_ = 640, 400
 def render_bev(ts, pls, out_mp4, label, max_s=120):
     t0 = ts[0]; dur = min(ts[-1] - t0, max_s)
     # extent from first second of data
@@ -78,7 +93,7 @@ def render_bev(ts, pls, out_mp4, label, max_s=120):
     d.line([(16, H_ - 20), (16 + bl * ppm, H_ - 20)], fill=(200, 210, 225), width=2); d.text((16, H_ - 40), f"{bl} m", font=FONT, fill=(200, 210, 225))
     bg = np.asarray(base).copy()
     proc = subprocess.Popen([FF, "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W_}x{H_}", "-r", "10", "-i", "-",
-                             "-c:v", "libx264", "-preset", "slow", "-crf", "30", "-pix_fmt", "yuv420p", "-movflags", "+faststart", out_mp4], stdin=subprocess.PIPE)
+                             "-c:v", "libx264", "-preset", "slow", "-crf", "35", "-pix_fmt", "yuv420p", "-movflags", "+faststart", out_mp4], stdin=subprocess.PIPE)
     n = int(dur * 10)
     for k in range(n):
         P = frame_points(ts, pls, t0 + k * 0.1, t0 + (k + 1) * 0.1)
@@ -112,16 +127,26 @@ def main(only=None):
         sd = dict({k: v for k, v in S.items() if k not in ("caps", "camera")}, caps=[], cameras=[])
         cams = S.get("camera") or []
         for j, cam in enumerate([cams] if isinstance(cams, str) else cams):
-            fn = f"{S['id']}__camera{j or ''}.mp4"; transcode(cam, os.path.join(MEDIA, fn), 720, crf=32)
-            sd["cameras"].append({"video": "media/" + fn, "source": os.path.basename(cam)})
+            label = None
+            if isinstance(cam, dict): label, cam = cam.get("label"), cam["path"]
+            src = cam
+            if cam.startswith("pptx:"):  # video embedded in a slide deck: "pptx:<deck>|<member>"
+                deck, member = cam[5:].split("|")
+                src = os.path.join(REL, "_tmp_" + os.path.basename(member))
+                with zipfile.ZipFile(deck) as z, open(src, "wb") as f: f.write(z.read(member))
+                cam = os.path.basename(deck) + " (" + os.path.basename(member) + ")"
+            fn = f"{S['id']}__camera{j or ''}.mp4"; transcode(src, os.path.join(MEDIA, fn), 720, crf=32)
+            sd["cameras"].append({"video": "media/" + fn, "source": os.path.basename(cam), "label": label})
         os.makedirs(os.path.join(REL, S["id"]), exist_ok=True)
         for c in S["caps"]:
             name = os.path.splitext(os.path.basename(c["pcap"]))[0].strip().replace("&", "and").replace(" ", "_")
             print("->", S["id"], name, flush=True)
-            raw, h, ts, pls = read_pcap(c["pcap"])
+            raw, h, ts, pls, kind = read_pcap(c["pcap"])
+            model, mode = describe(kind, pls[0])
+            t0 = datetime.datetime.fromtimestamp(ts[0])
             info = dict(role=c["role"], label=c["label"], file=name + ".pcap", bytes=len(raw), sha256=h, packets=len(pls),
-                        start=datetime.datetime.fromtimestamp(ts[0]).strftime("%Y-%m-%d %H:%M:%S"), duration=round(float(ts[-1] - ts[0]), 1),
-                        model=MODEL.get(pls[0][1205], hex(pls[0][1205])), mode=RMODE.get(pls[0][1204], hex(pls[0][1204])),
+                        start=t0.strftime("%Y-%m-%d %H:%M:%S") if t0.year > 2000 else None, duration=round(float(ts[-1] - ts[0]), 1),
+                        model=model, mode=mode,
                         source=os.path.relpath(c["pcap"], os.path.dirname(os.path.dirname(c["pcap"]))).replace("\\", "/"))
             zp = os.path.join(REL, S["id"], name + ".zip")
             if not os.path.exists(zp):

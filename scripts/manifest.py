@@ -3,10 +3,14 @@ W = U + "/website用素材"
 P = U + "/0_過去のLiDAR測距データ"
 V16 = P + "/Velodyne VLP-16"
 N25 = r"G:/共有ドライブ/吉岡研-共有ドライブ/004-Paper Submission/NDSS2025"
+NAG = r"G:/共有ドライブ/吉岡研-共有ドライブ/011-個人ファイル/Nagata"
+ICRA_TALK = "pptx:" + r"G:/共有ドライブ/吉岡研-共有ドライブ/009-学会発表資料/ICRA2025/ICAR_slide_2_Eng (2).pptx" + "|ppt/media/media1.mp4"
 
 PAPERS = {
   "ndss24": dict(short="NDSS 2024", release="v1.0", url="https://sites.google.com/keio.jp/keio-csg/projects/new-gen-lidar-sec",
                  title="LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies"),
+  "icra25": dict(short="ICRA 2025", release="icra25-v1.0", url="https://arxiv.org/abs/2502.13641", code="https://github.com/Keio-CSG/slamspoof",
+                 title="SLAMSpoof: Practical LiDAR Spoofing Attacks on Localization Systems Guided by Scan Matching Vulnerability Analysis"),
   "ndss25": dict(short="NDSS 2025", release="ndss25-v1.0",
                  title="On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance"),
 }
@@ -76,5 +80,40 @@ SETS = [
   dict(paper="ndss25", id="mvs-autoware", group="Removal", title="End-to-end attack on an Autoware vehicle", lidar="VLP-32C", scene="Outdoor, dynamic", date="2024-08",
        note="PIXKIT with a VLP-32C, driven by Autoware.ai, benign vs. under attack (paper Fig. 16). Only the video is available; the LiDAR data of this run was not archived as pcap.",
        camera=N25+"/autoware.mp4", caps=[]),
+  # ---- NDSS 2025: A-HFR against pulse-fingerprinting LiDARs (Hesai AT128 / XT32) ----
+  dict(paper="ndss25", id="ahfr-at128-pedestrian", group="Removal", title="A-HFR vs. HFR on AT128: pedestrian at 3 m", lidar="AT128", scene="Indoor, static", date="2023-11-23",
+       note="AT128 has pulse fingerprinting. The plain HFR attack leaves most points in place (5 MHz) or is limited by laser overheating (15 MHz), while the adaptive HFR (A-HFR) at 15 MHz removes almost all points (paper Fig. 11).",
+       caps=[dict(role="benign", label="Benign", pcap=P+"/Hesai AT128/at128_remove_human_3m.pcap"),
+             dict(role="attack", label="HFR · 5 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_hfr_5mhz.pcap"),
+             dict(role="attack", label="HFR · 15 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_hfr_15mhz.pcap"),
+             dict(role="attack", label="A-HFR · 15 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_adphfr_15mhz_take2.pcap")]),
+  dict(paper="ndss25", id="ahfr-at128-width", group="Removal", title="A-HFR attack width sweep on AT128", lidar="AT128", scene="Indoor, static", date="2024-04-04",
+       note="A-HFR at 15 MHz with horizontal attack ranges from 10 to 60 degrees (paper Table VI).",
+       caps=[dict(role="benign", label="Benign", pcap=P+"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_benign.pcap")] +
+            [dict(role="attack", label=f"A-HFR · {d}° wide", pcap=P+f"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_{d}deg.pcap") for d in range(10, 70, 10)]),
+  dict(paper="ndss25", id="ahfr-xt32-width", group="Removal", title="A-HFR attack width sweep on XT32", lidar="XT32", scene="Indoor, static", date="2024-04-04",
+       note="A-HFR at 24 MHz with horizontal attack ranges from 10 to 60 degrees (paper Table VI). XT32 needs a higher frequency, so the removal rate drops faster as the range widens.",
+       caps=[dict(role="benign", label="Benign", pcap=P+"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_benign.pcap")] +
+            [dict(role="attack", label=f"A-HFR · {d}° wide", pcap=P+f"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_{d}deg.pcap") for d in range(10, 70, 10)]),
+  dict(paper="ndss25", id="ahfr-at128-highspeed", group="Removal", title="A-HFR against AT128 on a moving vehicle", lidar="AT128", scene="Test track, dynamic", date="2024-04-10",
+       note="The AT128 rides on a vehicle driving at 10–60 km/h past a pedestrian while the MVS system tracks it and fires A-HFR at 15 MHz (paper Table IX). Speeds and run numbers come from the file names; the benign drive is the reference used in the paper's analysis.",
+       caps=[dict(role="benign", label="Benign drive", pcap=U+"/2025_NDSS_DATA/Adaptive HFR moving vehicle/benign.pcap")] +
+            [dict(role="attack", label=f"A-HFR · {v} km/h · run {r}", pcap=P+f"/2024-04-10-K2/at128_20240410_{v}_{r}.pcap")
+             for v, runs in ((10, 3), (20, 3), (30, 3), (40, 4), (50, 4), (60, 3)) for r in range(1, runs + 1)]),
+  # ---- ICRA 2025: SLAMSpoof ----
+  dict(paper="icra25", id="slamspoof-primitives", group="Removal", title="Removal and injection seen by a VLP-16", lidar="VLP-16", scene="Indoor corridor, static", date="2024-09-13",
+       note="The two attack primitives SLAMSpoof places along a trajectory: HFR removal, which turns the attacked sector into scattered noise, and injection of a fake wall that the scan matcher latches onto.",
+       caps=[dict(role="benign", label="Benign", pcap=NAG+"/0913/2024-09-13-14-55-00_Velodyne-VLP-16-Data-benign.pcap"),
+             dict(role="attack", label="HFR removal", pcap=NAG+"/0913/2024-09-13-14-55-51_Velodyne-VLP-16-Data-hfr.pcap"),
+             dict(role="attack", label="Fake-wall injection", pcap=NAG+"/0913/2024-09-13-15-11-23_Velodyne-VLP-16-Data-wall2.pcap")]),
+  dict(paper="icra25", id="slamspoof-whill", group="Removal", title="Attacking a moving WHILL from the roadside", lidar="VLP-32C", scene="Outdoor, dynamic", date="2024-08-20",
+       note="A WHILL CR2 carrying a VLP-32C drives across a sports field towards the tracking spoofer (under the tent), which attacks it from up to 50 m. The screen recording shows the localization output under attack. The LiDAR data of these runs is not on the lab drive, so this set is video only.",
+       camera=[dict(path=NAG+f"/IMG_{n}.MOV", label=f"Field camera · run {i}") for i, n in enumerate(("0123", "0128", "0136", "0141"), 1)] +
+              [dict(path=NAG+"/Screencast from 2024年11月05日 13時30分10秒.webm", label="Localization under attack (screen recording)")], caps=[]),
+  dict(paper="icra25", id="slamspoof-talk", group="Removal", title="Talk video: SMVS and spoofer placement", lidar="VLP-32C", scene="Outdoor, dynamic", date="2025-05",
+       note="The video shown in the ICRA 2025 talk: the Scan Matching Vulnerability Score, how it picks spoofer placements, and the attack results.",
+       camera=[dict(path=ICRA_TALK, label="ICRA 2025 talk video")], caps=[]),
 ]
 SETUP_IMAGES = [W+"/setup/indoor_setup_caption.png", W+"/setup/outdoor_setup_caption.png", W+"/car_removal_attack/car_HFR_setup.jpg"]
+
+AT128_CORR = P + "/Hesai AT128/AT128E2X_Angle_Correction_File.dat"

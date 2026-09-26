@@ -8,9 +8,16 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--repo", default="")
 ap.add_argument("--ga", default="")
 ap.add_argument("--out", default=os.path.join(ROOT, "docs", "index.html"))
+ap.add_argument("--papers", default="", help="comma-separated paper keys to include (default: all)")
+ap.add_argument("--title", default="")
+ap.add_argument("--nav", action="append", default=[], help="LABEL=HREF link to a sibling page (repeatable)")
 a = ap.parse_args()
 data = json.load(open(os.path.join(ROOT, "docs", "data.json"), encoding="utf-8"))
+if a.papers:
+    keep = a.papers.split(","); data["sets"] = [x for x in data["sets"] if x["paper"] in keep]
+data["nav"] = [dict(label=n.split("=", 1)[0], href=n.split("=", 1)[1]) for n in a.nav]
 html = open(os.path.join(ROOT, "scripts", "page.template.html"), encoding="utf-8").read()
+if a.title: html = html.replace("<title>New-Gen LiDAR Spoofing Captures</title>", f"<title>{a.title}</title>", 1)
 html = html.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False)).replace('/*REPO*/""', json.dumps(a.repo.rstrip("/")))
 if a.ga:
     tag = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={a.ga}"></script>\n'
