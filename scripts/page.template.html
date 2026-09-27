@@ -62,6 +62,9 @@ nav.filters .lab{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform
 .fg{display:flex;flex-wrap:wrap;gap:6px;margin-right:14px;align-items:center}
 button.chip{font:500 13px/1 var(--body);border:1px solid transparent;background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer}
 button.chip[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+a.chip{font:500 13px/1 var(--body);background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:999px;text-decoration:none;border:1px solid transparent}
+a.chip:hover{border-color:var(--ink-3)}
+a.chip[aria-current="page"]{background:var(--ink);color:var(--ground)}
 
 section.set{padding-block:34px 10px;border-bottom:1px solid var(--rule)}
 .set-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:end}
@@ -131,6 +134,7 @@ figure.setup{margin:0}
   </header>
 
   <nav class="filters" aria-label="Filter experiments">
+    <div class="fg" id="paperswitch"><span class="lab">Paper</span></div>
     <div class="fg"><span class="lab">Attack</span>
       <button class="chip" data-f="group" data-v="all" aria-pressed="true">All</button>
       <button class="chip" data-f="group" data-v="CPI" aria-pressed="false">Injection (CPI)</button>
@@ -287,8 +291,17 @@ function papers() {
   $("#eyebrow").textContent = "Keio University · Computing and Sensing Group · " + ps.map(p => p.short).join(" / ");
   const models = [...new Set(DATA.sets.flatMap(s => s.caps.map(c => c.model)))];
   $("#ledehead").textContent = "Packet captures (.pcap) from " + models.join(", ") + " LiDARs in the physical experiments behind " + (ps.length > 1 ? "these papers" : "this paper") + ", each paired with a video.";
+  // paper switcher: this page's paper is selected, the others link to their pages
+  const here = [...used][0];
+  const pages = [[here, null], ...(DATA.nav || []).filter(n => DATA.papers[n.label]).map(n => [n.label, n.href])]
+    .sort((a, b) => Object.keys(DATA.papers).indexOf(a[0]) - Object.keys(DATA.papers).indexOf(b[0]));
+  const order = ["ndss24", "ndss25", "icra25"]; pages.sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]));
+  $("#paperswitch").append(...pages.map(([k, href]) => href
+    ? el("a", { class: "chip", href, text: DATA.papers[k].short })
+    : el("a", { class: "chip", "aria-current": "page", href: "#", text: DATA.papers[k].short })));
+  if (pages.length < 2) $("#paperswitch").hidden = true;
   // hide filters that cannot change anything on this page
-  document.querySelectorAll("nav.filters .fg").forEach(g => {
+  document.querySelectorAll("nav.filters .fg:not(#paperswitch)").forEach(g => {
     const f = g.querySelector("button.chip").dataset.f; const vals = new Set(DATA.sets.map(s => f === "motion" ? motion(s) : s[f]));
     g.querySelectorAll("button.chip").forEach(b => { if (b.dataset.v !== "all" && !vals.has(b.dataset.v)) b.hidden = true; });
     if (vals.size < 2) g.hidden = true;
