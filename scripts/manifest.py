@@ -11,7 +11,7 @@ PAPERS = {
                  title="LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies"),
   "icra25": dict(short="ICRA 2025", release="icra25-v1.0", url="https://arxiv.org/abs/2502.13641", code="https://github.com/Keio-CSG/slamspoof",
                  title="SLAMSpoof: Practical LiDAR Spoofing Attacks on Localization Systems Guided by Scan Matching Vulnerability Analysis"),
-  "ndss25": dict(short="NDSS 2025", release="ndss25-v1.0",
+  "ndss25": dict(short="NDSS 2025", release="ndss25-v1.0", url="https://sites.google.com/keio.jp/keio-csg/projects/AttackonDrivingVehicle",
                  title="On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance"),
 }
 

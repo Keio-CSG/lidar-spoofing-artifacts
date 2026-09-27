@@ -17,6 +17,7 @@
   "ndss25": {
    "short": "NDSS 2025",
    "release": "ndss25-v1.0",
+   "url": "https://sites.google.com/keio.jp/keio-csg/projects/AttackonDrivingVehicle",
    "title": "On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance"
   }
  },
