@@ -10,7 +10,7 @@ ap.add_argument("--ga", default="")
 ap.add_argument("--out", default=os.path.join(ROOT, "docs", "index.html"))
 ap.add_argument("--papers", default="", help="comma-separated paper keys to include (default: all)")
 ap.add_argument("--title", default="")
-ap.add_argument("--nav", action="append", default=[], help="LABEL=HREF link to a sibling page (repeatable)")
+ap.add_argument("--nav", action="append", default=[], help="PAPER_KEY=HREF (or LABEL=HREF) link to a sibling page, shown with the paper's badge and title (repeatable)")
 a = ap.parse_args()
 data = json.load(open(os.path.join(ROOT, "docs", "data.json"), encoding="utf-8"))
 if a.papers:
