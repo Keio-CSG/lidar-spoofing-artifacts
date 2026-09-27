@@ -33,6 +33,7 @@
   --chip:#1c2636; --focus:#7aa2ff;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 a{color:var(--accent)}
@@ -131,11 +132,6 @@ figure.setup{margin:0}
   </header>
 
   <nav class="filters" aria-label="Filter experiments">
-    <div class="fg"><span class="lab">Paper</span>
-      <button class="chip" data-f="paper" data-v="all" aria-pressed="true">All</button>
-      <button class="chip" data-f="paper" data-v="ndss24" aria-pressed="false">NDSS 2024</button>
-      <button class="chip" data-f="paper" data-v="ndss25" aria-pressed="false">NDSS 2025</button>
-    </div>
     <div class="fg"><span class="lab">Attack</span>
       <button class="chip" data-f="group" data-v="all" aria-pressed="true">All</button>
       <button class="chip" data-f="group" data-v="CPI" aria-pressed="false">Injection (CPI)</button>
@@ -271,7 +267,7 @@ function render() {
   }
 }
 
-const state = { paper: "all", group: "all", motion: "all", lidar: "all" };
+const state = { group: "all", motion: "all", lidar: "all" };
 document.querySelectorAll("button.chip").forEach(b => b.onclick = () => {
   state[b.dataset.f] = b.dataset.v;
   document.querySelectorAll(`button.chip[data-f="${b.dataset.f}"]`).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
