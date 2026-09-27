@@ -82,10 +82,8 @@ SETS = [
        camera=N25+"/autoware.mp4", caps=[]),
   # ---- NDSS 2025: A-HFR against pulse-fingerprinting LiDARs (Hesai AT128 / XT32) ----
   dict(paper="ndss25", id="ahfr-at128-pedestrian", group="Removal", title="A-HFR vs. HFR on AT128: pedestrian at 3 m", lidar="AT128", scene="Indoor, static", date="2023-11-23",
-       note="AT128 has pulse fingerprinting. The plain HFR attack leaves most points in place (5 MHz) or is limited by laser overheating (15 MHz), while the adaptive HFR (A-HFR) at 15 MHz removes almost all points (paper Fig. 11).",
+       note="AT128 has pulse fingerprinting, which defeats the plain HFR attack; the adaptive HFR (A-HFR) at 15 MHz still removes almost all points (paper Fig. 11).",
        caps=[dict(role="benign", label="Benign", pcap=P+"/Hesai AT128/at128_remove_human_3m.pcap"),
-             dict(role="attack", label="HFR · 5 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_hfr_5mhz.pcap"),
-             dict(role="attack", label="HFR · 15 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_hfr_15mhz.pcap"),
              dict(role="attack", label="A-HFR · 15 MHz", pcap=P+"/Hesai AT128/at128_remove_human_3m_adphfr_15mhz_take2.pcap")]),
   dict(paper="ndss25", id="ahfr-at128-width", group="Removal", title="A-HFR attack width sweep on AT128", lidar="AT128", scene="Indoor, static", date="2024-04-04",
        note="A-HFR at 15 MHz with horizontal attack ranges from 10 to 60 degrees (paper Table VI).",
@@ -96,10 +94,11 @@ SETS = [
        caps=[dict(role="benign", label="Benign", pcap=P+"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_benign.pcap")] +
             [dict(role="attack", label=f"A-HFR · {d}° wide", pcap=P+f"/2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_{d}deg.pcap") for d in range(10, 70, 10)]),
   dict(paper="ndss25", id="ahfr-at128-highspeed", group="Removal", title="A-HFR against AT128 on a moving vehicle", lidar="AT128", scene="Test track, dynamic", date="2024-04-10",
-       note="The AT128 rides on a vehicle driving at 10–60 km/h past a pedestrian while the MVS system tracks it and fires A-HFR at 15 MHz (paper Table IX). Speeds and run numbers come from the file names; the benign drive is the reference used in the paper's analysis.",
+       note="The AT128 rides on a vehicle driving past a pedestrian while the MVS system tracks it and fires A-HFR at 15 MHz (paper Table IX). This is the 60 km/h run used in the paper's detection analysis, together with the benign reference drive; the vehicle is stopped for the first few seconds.",
        caps=[dict(role="benign", label="Benign drive", pcap=U+"/2025_NDSS_DATA/Adaptive HFR moving vehicle/benign.pcap")] +
-            [dict(role="attack", label=f"A-HFR · {v} km/h · run {r}", pcap=P+f"/2024-04-10-K2/at128_20240410_{v}_{r}.pcap")
-             for v, runs in ((10, 3), (20, 3), (30, 3), (40, 4), (50, 4), (60, 3)) for r in range(1, runs + 1)]),
+            # Only the run used in the paper's detection analysis is published; the attack did not visibly take effect in
+            # every other run (at128_20240410_{10,20,30}_{1-3}, {40,50}_{1-4}, 60_{1,2}), so those are left out.
+            [dict(role="attack", label="A-HFR · 60 km/h", pcap=P+"/2024-04-10-K2/at128_20240410_60_3.pcap")]),
   # ---- ICRA 2025: SLAMSpoof ----
   dict(paper="icra25", id="slamspoof-primitives", group="Removal", title="Removal and injection seen by a VLP-16", lidar="VLP-16", scene="Indoor corridor, static", date="2024-09-13",
        note="The two attack primitives SLAMSpoof places along a trajectory: HFR removal, which turns the attacked sector into scattered noise, and injection of a fake wall that the scan matcher latches onto.",

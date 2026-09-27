@@ -1,0 +1,295 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>High-Speed LiDAR Spoofing Captures</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QYEN5RGBVF"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QYEN5RGBVF');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --panel:#ffffff; --ink:#0f1a2a; --ink-2:#48566b; --ink-3:#7a8699;
+  --rule:#d6dce4; --scope:#090e18; --accent:#1d4ed8; --accent-ink:#ffffff;
+  --attack:#c2410c; --attack-bg:#fdeee6; --benign:#0f766e; --benign-bg:#e3f4f1;
+  --chip:#e2e7ee; --focus:#1d4ed8;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0c121c; --panel:#131b28; --ink:#e6ebf2; --ink-2:#a6b1c2; --ink-3:#77849a;
+    --rule:#243044; --scope:#05080f; --accent:#7aa2ff; --accent-ink:#0b1220;
+    --attack:#fb8a5a; --attack-bg:#3a1d12; --benign:#4fd1c0; --benign-bg:#0f2e2b;
+    --chip:#1c2636; --focus:#7aa2ff;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0c121c; --panel:#131b28; --ink:#e6ebf2; --ink-2:#a6b1c2; --ink-3:#77849a;
+  --rule:#243044; --scope:#05080f; --accent:#7aa2ff; --accent-ink:#0b1220;
+  --attack:#fb8a5a; --attack-bg:#3a1d12; --benign:#4fd1c0; --benign-bg:#0f2e2b;
+  --chip:#1c2636; --focus:#7aa2ff;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+header.top{display:grid;gap:18px;padding-bottom:26px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--display);font-stretch:78%;font-weight:750;font-size:clamp(34px,5.4vw,58px);line-height:.98;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{max-width:68ch;color:var(--ink-2);margin:0;font-size:16px}
+.papers{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px;color:var(--ink-2)}
+.papers b{color:var(--ink);font-weight:600}
+.papers .ptag{font:600 11px/1 var(--mono);background:var(--ink);color:var(--ground);padding:4px 6px;border-radius:3px;margin-right:8px;vertical-align:1px}
+.stats{display:flex;flex-wrap:wrap;gap:10px 28px;font:500 13px/1.3 var(--mono);color:var(--ink-2)}
+.stats b{display:block;font:700 26px/1.1 var(--display);font-stretch:80%;color:var(--ink)}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+nav.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:14px;border-bottom:1px solid var(--rule)}
+nav.filters .lab{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.fg{display:flex;flex-wrap:wrap;gap:6px;margin-right:14px;align-items:center}
+button.chip{font:500 13px/1 var(--body);border:1px solid transparent;background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+
+section.set{padding-block:34px 10px;border-bottom:1px solid var(--rule)}
+.set-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:end}
+.set-head h2{font-family:var(--display);font-stretch:82%;font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.05;margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font:500 12px/1 var(--mono);padding:5px 8px;border-radius:4px;background:var(--chip);color:var(--ink-2)}
+.tag.grp{background:var(--ink);color:var(--ground)}
+.note{max-width:72ch;color:var(--ink-2);margin:12px 0 0}
+.syncbtn{font:600 13px/1 var(--body);background:var(--accent);color:var(--accent-ink);border:0;padding:10px 14px;border-radius:6px;cursor:pointer;white-space:nowrap}
+
+.caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px;margin-top:20px}
+.cap{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.cap.benign{border-top:3px solid var(--benign)}
+.cap.attack{border-top:3px solid var(--attack)}
+.cap.camera{border-top:3px solid var(--ink-3)}
+.screen{position:relative;background:var(--scope);aspect-ratio:16/10}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--scope)}
+.views{display:flex;gap:0;border-bottom:1px solid var(--rule)}
+.views button{flex:1;font:500 12px/1 var(--body);padding:9px 6px;background:transparent;border:0;border-right:1px solid var(--rule);color:var(--ink-2);cursor:pointer}
+.views button:last-child{border-right:0}
+.views button[aria-pressed="true"]{color:var(--ink);background:var(--chip);font-weight:600}
+.cap-body{padding:12px 14px 14px;display:grid;gap:10px}
+.cap-title{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:3px}
+.pill.attack{background:var(--attack-bg);color:var(--attack)}
+.pill.benign{background:var(--benign-bg);color:var(--benign)}
+.pill.camera{background:var(--chip);color:var(--ink-2)}
+.cap-title h3{font:600 15px/1.25 var(--body);margin:0}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:13px}
+dl.kv dt{color:var(--ink-3)}
+dl.kv dd{margin:0;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.file{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:10px;border-top:1px dashed var(--rule)}
+.file code{font:500 12.5px/1.3 var(--mono);overflow-wrap:anywhere;flex:1 1 180px}
+.btn{font:600 12.5px/1 var(--body);border:1px solid var(--rule);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:5px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.hash{font:400 11px/1.35 var(--mono);color:var(--ink-3);overflow-wrap:anywhere}
+.src{font:400 11.5px/1.35 var(--mono);color:var(--ink-3)}
+
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px;padding-block:36px 0}
+.about h2{font-family:var(--display);font-stretch:82%;font-size:24px;margin:0 0 10px}
+.about p,.about li{color:var(--ink-2);font-size:14px}
+.about ul{padding-left:18px;margin:0}
+pre.bib{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:12px;font:12px/1.5 var(--mono);overflow-x:auto;color:var(--ink);white-space:pre}
+figure.setup{margin:0}
+.setup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin-top:12px}
+.setup-grid img{width:100%;border-radius:6px;border:1px solid var(--rule);display:block;background:var(--panel)}
+.setup-grid figcaption{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 14px;border-radius:6px;font-size:13px}
+@media (max-width:640px){.set-head{grid-template-columns:1fr}.syncbtn{justify-self:start}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow" id="eyebrow">Keio University · Computing and Sensing Group</div>
+    <h1>LiDAR spoofing: <em>raw captures</em> of injection and removal attacks</h1>
+    <p class="lede"><span id="ledehead">Packet captures (.pcap) from the physical experiments behind our LiDAR spoofing papers, each paired with a video.</span> Every capture comes with a bird’s-eye rendering made from the pcap itself; where the original VeloView screen recording or a camera view exists, it is shown alongside.</p>
+    <ul class="papers" id="papers"></ul>
+    <div class="stats" id="stats"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--benign)"></i>Benign capture</span>
+      <span><i class="sw" style="background:var(--attack)"></i>Attack capture</span>
+      <span><i class="sw" style="background:var(--ink-3)"></i>Camera view of the scene</span>
+      <span>CPI = Chosen Pattern Injection · PRA = Physical Removal Attack (synchronized) · HFR = High-Frequency Removal · A-HFR = adaptive HFR</span>
+    </div>
+  </header>
+
+  <nav class="filters" aria-label="Filter experiments">
+    <div class="fg"><span class="lab">Paper</span>
+      <button class="chip" data-f="paper" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="paper" data-v="ndss24" aria-pressed="false">NDSS 2024</button>
+      <button class="chip" data-f="paper" data-v="ndss25" aria-pressed="false">NDSS 2025</button>
+    </div>
+    <div class="fg"><span class="lab">Attack</span>
+      <button class="chip" data-f="group" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="group" data-v="CPI" aria-pressed="false">Injection (CPI)</button>
+      <button class="chip" data-f="group" data-v="Removal" aria-pressed="false">Removal (PRA / HFR)</button>
+    </div>
+    <div class="fg"><span class="lab">Scene</span>
+      <button class="chip" data-f="motion" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="motion" data-v="static" aria-pressed="false">Static</button>
+      <button class="chip" data-f="motion" data-v="dynamic" aria-pressed="false">Dynamic</button>
+    </div>
+    <div class="fg"><span class="lab">LiDAR</span>
+      <button class="chip" data-f="lidar" data-v="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="lidar" data-v="VLP-16" aria-pressed="false">VLP-16</button>
+      <button class="chip" data-f="lidar" data-v="VLP-32C" aria-pressed="false">VLP-32C</button>
+      <button class="chip" data-f="lidar" data-v="AT128" aria-pressed="false">AT128</button>
+      <button class="chip" data-f="lidar" data-v="XT32" aria-pressed="false">XT32</button>
+    </div>
+  </nav>
+
+  <main id="sets"></main>
+
+  <div class="about">
+    <div>
+      <h2>Using the captures</h2>
+      <ul>
+        <li>Each download is a zip holding one unmodified pcap, exactly as recorded (VeloView, PandarView or Wireshark) on UDP port 2368. The SHA-256 shown is that of the pcap inside.</li>
+        <li>Open Velodyne captures in <a href="https://www.paraview.org/veloview/" target="_blank" rel="noopener">VeloView</a> (or <code>velodyne_decoder</code>, ROS <code>velodyne_pointcloud</code>) and Hesai captures in PandarView or the Hesai LiDAR SDK. AT128 needs its angle-correction file, which is attached to the NDSS 2025 release. The LiDAR model and return mode below are read from the packets themselves.</li>
+        <li>Bird’s-eye renderings are top-down views, 0.1 s per frame (one 600 rpm revolution), coloured by height. In dual-return captures only the first return of each pair is drawn. AT128 renderings ignore its fine per-channel angle offsets (under about 0.5°).</li>
+        <li>Recorded videos are VeloView screen recordings made during the experiments; some were matched to their capture by timestamp.</li>
+        <li>“Removal check” (Hesai captures): share of 0.1 s frames with an azimuth gap of at least 8° where the scene normally returns points, and the longest run of such frames. Benign captures score 0 %. Attack runs in which the attack did not take effect are not published.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="about" style="padding-top:28px" id="setup">
+    <div style="grid-column:1/-1">
+      <h2>Experimental setup (NDSS 2024)</h2>
+      <div class="setup-grid">
+        <figure class="setup"><img src="media/setup0.jpg" alt="Indoor spoofing setup with laser spoofer aimed at the LiDAR"><figcaption>Indoor setup</figcaption></figure>
+        <figure class="setup"><img src="media/setup1.jpg" alt="Outdoor spoofing setup in a parking lot"><figcaption>Outdoor setup</figcaption></figure>
+        <figure class="setup"><img src="media/setup2.jpg" alt="Vehicle-removal setup with a parked car in front of the LiDAR"><figcaption>Vehicle removal (HFR)</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"generated": "2026-09-26", "papers": {"ndss24": {"short": "NDSS 2024", "release": "v1.0", "url": "https://sites.google.com/keio.jp/keio-csg/projects/new-gen-lidar-sec", "title": "LiDAR Spoofing Meets the New-Gen: Capability Improvements, Broken Assumptions, and New Attack Strategies"}, "icra25": {"short": "ICRA 2025", "release": "icra25-v1.0", "url": "https://arxiv.org/abs/2502.13641", "code": "https://github.com/Keio-CSG/slamspoof", "title": "SLAMSpoof: Practical LiDAR Spoofing Attacks on Localization Systems Guided by Scan Matching Vulnerability Analysis"}, "ndss25": {"short": "NDSS 2025", "release": "ndss25-v1.0", "title": "On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance"}}, "sets": [{"paper": "ndss25", "id": "mvs-wall-40kmh", "group": "CPI", "title": "Ghost-wall injection at 40 km/h", "lidar": "VLP-32C", "scene": "Test track, dynamic", "date": "2024-03-13", "note": "The VLP-32C rides on a vehicle driving towards the roadside MVS system, which tracks the LiDAR and injects a ghost wall ahead of the vehicle. The camera clip starts two seconds before the capture.", "caps": [{"role": "attack", "label": "Synchronized injection · 40 km/h", "file": "2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.pcap", "bytes": 69707096, "sha256": "d6370639d7aad651b2c00ba1b4eee9cc44d479c14419d4230a99b5535687ef46", "packets": 55148, "start": "2024-03-13 16:41:17", "duration": 18.3, "model": "VLP-32C", "mode": "dual", "source": "2024-03-13-K2実験/2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.pcap", "zip": "mvs-wall-40kmh/2024-03-13-16-41-02_Velodyne-VLP-32C-Data_injection.zip", "zip_bytes": 31171102, "bev": "media/mvs-wall-40kmh__2024-03-13-16-41-02-velodyne-vlp-32c-data-injection__bev.mp4"}], "cameras": [{"video": "media/mvs-wall-40kmh__camera.mp4", "source": "CPI_40kph.MOV"}]}, {"paper": "ndss25", "id": "mvs-wall-30kmh", "group": "CPI", "title": "Ghost-wall injection at 30 km/h", "lidar": "VLP-32C", "scene": "Test track, dynamic", "date": "2024-03-15", "note": "Same setup as the 40 km/h run, with the vehicle at 30 km/h.", "caps": [{"role": "attack", "label": "Synchronized injection · 30 km/h", "file": "2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.pcap", "bytes": 163758808, "sha256": "be6bf6bcef8df2b0b4896044609d8bd09d10144a5edab2715bb450cfa8b232a3", "packets": 129556, "start": "2024-03-15 16:44:21", "duration": 21.5, "model": "VLP-32C", "mode": "dual", "source": "LiDARデータ/2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.pcap", "zip": "mvs-wall-30kmh/2024-03-15-16-44-06_Velodyne-VLP-32C-Data_experiment1_wall_30km.zip", "zip_bytes": 38892973, "bev": "media/mvs-wall-30kmh__2024-03-15-16-44-06-velodyne-vlp-32c-data-experiment1-wall-30km__bev.mp4"}], "cameras": []}, {"paper": "ndss25", "id": "mvs-injection-runs", "group": "CPI", "title": "Injection runs on the test track", "lidar": "VLP-32C", "scene": "Test track, dynamic", "date": "2024-04-10", "note": "Six consecutive injection runs against the vehicle-mounted VLP-32C. Run speeds were not recorded in the file names.", "caps": [{"role": "attack", "label": "Injection run 1", "file": "vlp32c_20240410_CPItest.pcap", "bytes": 464341800, "sha256": "ff04979821d65e4698377f8022b6a30c1c7eddbd10fad81b6d22814f263c87d1", "packets": 367359, "start": "2024-04-10 15:44:36", "duration": 121.9, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest.zip", "zip_bytes": 209613292, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest__bev.mp4"}, {"role": "attack", "label": "Injection run 2", "file": "vlp32c_20240410_CPItest_2.pcap", "bytes": 173116200, "sha256": "daa92df96d5f55a5d5797e9cd5d2d8d3969c43015ea5c46854ced1ee9ba7bb74", "packets": 136959, "start": "2024-04-10 15:52:21", "duration": 45.4, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest_2.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_2.zip", "zip_bytes": 79482980, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-2__bev.mp4"}, {"role": "attack", "label": "Injection run 3", "file": "vlp32c_20240410_CPItest_3.pcap", "bytes": 150762360, "sha256": "f32852485352535936c7334669451d9a2a550956db9116582af204a1c2965fba", "packets": 119274, "start": "2024-04-10 16:22:12", "duration": 39.6, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest_3.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_3.zip", "zip_bytes": 68581404, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-3__bev.mp4"}, {"role": "attack", "label": "Injection run 4", "file": "vlp32c_20240410_CPItest_4.pcap", "bytes": 133872792, "sha256": "9d489d802e280583accbc875af96b0c2d7afd8b59dda56b327f7571e7d3790f2", "packets": 105912, "start": "2024-04-10 16:33:18", "duration": 35.1, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest_4.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_4.zip", "zip_bytes": 60462008, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-4__bev.mp4"}, {"role": "attack", "label": "Injection run 5", "file": "vlp32c_20240410_CPItest_5.pcap", "bytes": 111350840, "sha256": "2468cfbfba1fcf5b93d5b3d97b73c966046a287473fc177bdc3c38387f26a460", "packets": 88094, "start": "2024-04-10 16:45:35", "duration": 29.2, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest_5.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_5.zip", "zip_bytes": 50383911, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-5__bev.mp4"}, {"role": "attack", "label": "Injection run 6", "file": "vlp32c_20240410_CPItest_6.pcap", "bytes": 105296280, "sha256": "53c3fb49b85f2661bbeb6b92e10678ed2eb67fa396c18178682727126f25e832", "packets": 83304, "start": "2024-04-10 16:46:26", "duration": 27.6, "model": "VLP-32C", "mode": "dual", "source": "2024-04-10-K2/vlp32c_20240410_CPItest_6.pcap", "zip": "mvs-injection-runs/vlp32c_20240410_CPItest_6.zip", "zip_bytes": 47470503, "bev": "media/mvs-injection-runs__vlp32c-20240410-cpitest-6__bev.mp4"}], "cameras": []}, {"paper": "ndss25", "id": "mvs-cart-injection", "group": "CPI", "title": "Injection against a moving LiDAR on a cart", "lidar": "VLP-32C", "scene": "Outdoor, dynamic", "date": "2024-02-08", "note": "An early outdoor test of the auto-aiming spoofer: the VLP-32C is pushed on a cart towards the MVS system.", "caps": [{"role": "attack", "label": "Injection with auto-aiming", "file": "2024-02-08-vlp32c-2.pcap", "bytes": 114986104, "sha256": "65007ece3e60587b0ece4c810ad06572e11e14f315ec6eb8801934cec2c05765", "packets": 90970, "start": "2024-02-08 17:24:44", "duration": 30.2, "model": "VLP-32C", "mode": "dual", "source": "cpi/2024-02-08-vlp32c-2.pcap", "zip": "mvs-cart-injection/2024-02-08-vlp32c-2.zip", "zip_bytes": 34332395, "bev": "media/mvs-cart-injection__2024-02-08-vlp32c-2__bev.mp4"}], "cameras": [{"video": "media/mvs-cart-injection__camera.mp4", "source": "cpi_1.MOV"}, {"video": "media/mvs-cart-injection__camera1.mp4", "source": "cpi_2.MOV"}]}, {"paper": "ndss25", "id": "mvs-indoor-car", "group": "CPI", "title": "Indoor injection of a captured car", "lidar": "VLP-32C", "scene": "Indoor, static", "date": "2024-03-22 / 04-04", "note": "A real car and a real pedestrian are first captured with the VLP-32C; the car trace is then injected as a spoofed vehicle. The captures of the real objects are the benign references.", "caps": [{"role": "benign", "label": "Real car (source trace)", "file": "2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.pcap", "bytes": 426822488, "sha256": "8bb1c7de75a25f22d2cde803591ef73092331ab6ca9ce08899f3a62f88aecbed", "packets": 337676, "start": "2024-03-22 16:30:03", "duration": 115.8, "model": "VLP-32C", "mode": "dual", "source": "Velodyne VLP-32c/2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.pcap", "zip": "mvs-indoor-car/2024-03-22-16-30-00_Velodyne-VLP-32C-Data_real_car_capture.zip", "zip_bytes": 198394518, "bev": "media/mvs-indoor-car__2024-03-22-16-30-00-velodyne-vlp-32c-data-real-car-capture__bev.mp4"}, {"role": "benign", "label": "Real pedestrian (source trace)", "file": "2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.pcap", "bytes": 200111448, "sha256": "d3e9ed73b531e3dffd7cd7d6c835574752dc86964cea47014977b27061324cef", "packets": 158316, "start": "2024-03-22 16:33:23", "duration": 54.2, "model": "VLP-32C", "mode": "dual", "source": "Velodyne VLP-32c/2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.pcap", "zip": "mvs-indoor-car/2024-03-22-16-33-21_Velodyne-VLP-32C-Data_real_pedestrian_capture.zip", "zip_bytes": 89888791, "bev": "media/mvs-indoor-car__2024-03-22-16-33-21-velodyne-vlp-32c-data-real-pedestrian-capture__bev.mp4"}, {"role": "attack", "label": "Injected car", "file": "2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.pcap", "bytes": 32972728, "sha256": "1c44979c9c36c6c91d427630b2b3fefe706c678d11459f59924f0cbd20ba156e", "packets": 26086, "start": "2024-04-04 19:39:58", "duration": 8.7, "model": "VLP-32C", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.pcap", "zip": "mvs-indoor-car/2024-04-04-19-39-48_Velodyne-VLP-32C-Data_indoor_car_injection.zip", "zip_bytes": 12748193, "bev": "media/mvs-indoor-car__2024-04-04-19-39-48-velodyne-vlp-32c-data-indoor-car-injection__bev.mp4"}], "cameras": []}, {"paper": "ndss25", "id": "mvs-autoware", "group": "Removal", "title": "End-to-end attack on an Autoware vehicle", "lidar": "VLP-32C", "scene": "Outdoor, dynamic", "date": "2024-08", "note": "PIXKIT with a VLP-32C, driven by Autoware.ai, benign vs. under attack (paper Fig. 16). Only the video is available; the LiDAR data of this run was not archived as pcap.", "caps": [], "cameras": [{"video": "media/mvs-autoware__camera.mp4", "source": "autoware.mp4"}]}, {"paper": "ndss25", "id": "ahfr-at128-pedestrian", "group": "Removal", "title": "A-HFR vs. HFR on AT128: pedestrian at 3 m", "lidar": "AT128", "scene": "Indoor, static", "date": "2023-11-23", "note": "AT128 has pulse fingerprinting, which defeats the plain HFR attack; the adaptive HFR (A-HFR) at 15 MHz still removes almost all points (paper Fig. 11).", "caps": [{"role": "benign", "label": "Benign", "file": "at128_remove_human_3m.pcap", "bytes": 649240363, "sha256": "57140b7033135eb9c3cc2efbbf5284a6597df0fe7c84fa09fa7d53c536d339ad", "packets": 549601, "start": null, "duration": 91.0, "model": "AT128", "mode": "dual", "source": "Hesai AT128/at128_remove_human_3m.pcap", "zip": "ahfr-at128-pedestrian/at128_remove_human_3m.zip", "zip_bytes": 59379166, "bev": "media/ahfr-at128-pedestrian__at128-remove-human-3m__bev.mp4", "check": {"attacked_pct": 0.0, "longest_s": 0.0, "p90_gap_deg": 4}}, {"role": "attack", "label": "A-HFR · 15 MHz", "file": "at128_remove_human_3m_adphfr_15mhz_take2.pcap", "bytes": 630065689, "sha256": "460380d06204573f1abc8e5ee142af1b1c45f232c6bcb0244f451adad27ca81b", "packets": 533449, "start": null, "duration": 85.3, "model": "AT128", "mode": "dual", "source": "Hesai AT128/at128_remove_human_3m_adphfr_15mhz_take2.pcap", "zip": "ahfr-at128-pedestrian/at128_remove_human_3m_adphfr_15mhz_take2.zip", "zip_bytes": 62323365, "bev": "media/ahfr-at128-pedestrian__at128-remove-human-3m-adphfr-15mhz-take2__bev.mp4", "check": {"attacked_pct": 14.5, "longest_s": 8.3, "p90_gap_deg": 15}}], "cameras": []}, {"paper": "ndss25", "id": "ahfr-at128-width", "group": "Removal", "title": "A-HFR attack width sweep on AT128", "lidar": "AT128", "scene": "Indoor, static", "date": "2024-04-04", "note": "A-HFR at 15 MHz with horizontal attack ranges from 10 to 60 degrees (paper Table VI).", "caps": [{"role": "benign", "label": "Benign", "file": "2024-04-04_at128_benign.pcap", "bytes": 17354925, "sha256": "26d6120b7d4c8a9ac4e2ae89cc0ac37dc3c8dcbd8a1d5c3866807ddd220b1577", "packets": 14651, "start": null, "duration": 2.3, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_benign.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_benign.zip", "zip_bytes": 2080994, "bev": "media/ahfr-at128-width__2024-04-04-at128-benign__bev.mp4", "check": {"attacked_pct": 0.0, "longest_s": 0.0, "p90_gap_deg": 0}}, {"role": "attack", "label": "A-HFR · 10° wide", "file": "2024-04-04_at128_10deg.pcap", "bytes": 22397954, "sha256": "71657215d6c7b0df978a18a71b7593390645c0e8d06849eaf57a380abeafc47c", "packets": 18921, "start": null, "duration": 3.0, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_10deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_10deg.zip", "zip_bytes": 2462036, "bev": "media/ahfr-at128-width__2024-04-04-at128-10deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 2.8, "p90_gap_deg": 15}}, {"role": "attack", "label": "A-HFR · 20° wide", "file": "2024-04-04_at128_20deg.pcap", "bytes": 22037233, "sha256": "c1cd43fc8072c0545d8b732c310ad3d13257d076eb7e563cde3d32369d3028e4", "packets": 18616, "start": null, "duration": 2.9, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_20deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_20deg.zip", "zip_bytes": 2624476, "bev": "media/ahfr-at128-width__2024-04-04-at128-20deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 2.8, "p90_gap_deg": 24}}, {"role": "attack", "label": "A-HFR · 30° wide", "file": "2024-04-04_at128_30deg.pcap", "bytes": 46769827, "sha256": "c9602dbba7eaf762fab97aee5b579afe8b001687318523fae5e2b614694c5c1d", "packets": 39555, "start": null, "duration": 6.4, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_30deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_30deg.zip", "zip_bytes": 5425408, "bev": "media/ahfr-at128-width__2024-04-04-at128-30deg__bev.mp4", "check": {"attacked_pct": 79.0, "longest_s": 4.9, "p90_gap_deg": 24}}, {"role": "attack", "label": "A-HFR · 40° wide", "file": "2024-04-04_at128_40deg.pcap", "bytes": 85443114, "sha256": "e660fa9472e6863f68378958f79804254d334ea54799950b99ec814f8c2b2f75", "packets": 72298, "start": null, "duration": 11.7, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_40deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_40deg.zip", "zip_bytes": 10124175, "bev": "media/ahfr-at128-width__2024-04-04-at128-40deg__bev.mp4", "check": {"attacked_pct": 41.4, "longest_s": 2.4, "p90_gap_deg": 18}}, {"role": "attack", "label": "A-HFR · 50° wide", "file": "2024-04-04_at128_50deg.pcap", "bytes": 22278236, "sha256": "1b6ee7612198913d2953df1a01c5052b45ca8809a5ad8db4db9c05a7d673c746", "packets": 18820, "start": null, "duration": 3.0, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_50deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_50deg.zip", "zip_bytes": 2594683, "bev": "media/ahfr-at128-width__2024-04-04-at128-50deg__bev.mp4", "check": {"attacked_pct": 82.1, "longest_s": 1.2, "p90_gap_deg": 17}}, {"role": "attack", "label": "A-HFR · 60° wide", "file": "2024-04-04_at128_60deg.pcap", "bytes": 33573622, "sha256": "a679c44b9f29615a321d96e2fe84e9ed693f752e7383294152abe7645754c075", "packets": 28383, "start": null, "duration": 4.5, "model": "AT128", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_at128_60deg.pcap", "zip": "ahfr-at128-width/2024-04-04_at128_60deg.zip", "zip_bytes": 4025445, "bev": "media/ahfr-at128-width__2024-04-04-at128-60deg__bev.mp4", "check": {"attacked_pct": 56.8, "longest_s": 2.5, "p90_gap_deg": 20}}], "cameras": []}, {"paper": "ndss25", "id": "ahfr-xt32-width", "group": "Removal", "title": "A-HFR attack width sweep on XT32", "lidar": "XT32", "scene": "Indoor, static", "date": "2024-04-04", "note": "A-HFR at 24 MHz with horizontal attack ranges from 10 to 60 degrees (paper Table VI). XT32 needs a higher frequency, so the removal rate drops faster as the range widens.", "caps": [{"role": "benign", "label": "Benign", "file": "2024-04-04_xt32_benign.pcap", "bytes": 7752080, "sha256": "308cda35789aa6f95d2cb3c30940f5ea8ed2f4cd74aa53ecc49106543fabb9bd", "packets": 6812, "start": null, "duration": 2.7, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_benign.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_benign.zip", "zip_bytes": 3669807, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-benign__bev.mp4", "check": {"attacked_pct": 0.0, "longest_s": 0.0, "p90_gap_deg": 4}}, {"role": "attack", "label": "A-HFR · 10° wide", "file": "2024-04-04_xt32_10deg.pcap", "bytes": 9159786, "sha256": "1dddbafe274c7e868f5cad0ac44e3194e5016f2b7f465fb58a45d10ce611bc4c", "packets": 8049, "start": null, "duration": 3.2, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_10deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_10deg.zip", "zip_bytes": 4213688, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-10deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 3.1, "p90_gap_deg": 10}}, {"role": "attack", "label": "A-HFR · 20° wide", "file": "2024-04-04_xt32_20deg.pcap", "bytes": 10684706, "sha256": "d4e8167d222c8735921141553ce6611ed81e0d9ca2369ac7f33eee039305a679", "packets": 9389, "start": null, "duration": 3.8, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_20deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_20deg.zip", "zip_bytes": 4775158, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-20deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 3.6, "p90_gap_deg": 14}}, {"role": "attack", "label": "A-HFR · 30° wide", "file": "2024-04-04_xt32_30deg.pcap", "bytes": 20015168, "sha256": "7e0fddb8c69283233ea16054f065800ec138b056d761dcc11bfd4bfe9f1f9466", "packets": 17588, "start": null, "duration": 7.0, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_30deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_30deg.zip", "zip_bytes": 8844095, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-30deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 6.9, "p90_gap_deg": 14}}, {"role": "attack", "label": "A-HFR · 40° wide", "file": "2024-04-04_xt32_40deg.pcap", "bytes": 7409542, "sha256": "9645e90f4573b76184125c0826f5105bd6b89f4a4923ca59c578276bc71cd80c", "packets": 6511, "start": null, "duration": 2.6, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_40deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_40deg.zip", "zip_bytes": 3270678, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-40deg__bev.mp4", "check": {"attacked_pct": 100.0, "longest_s": 2.5, "p90_gap_deg": 14}}, {"role": "attack", "label": "A-HFR · 50° wide", "file": "2024-04-04_xt32_50deg.pcap", "bytes": 14741676, "sha256": "84b0a79ea979535951e0b8d294e83a00ab8fa939956a48fd24b298a0760afeb1", "packets": 12954, "start": null, "duration": 5.2, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_50deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_50deg.zip", "zip_bytes": 6556974, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-50deg__bev.mp4", "check": {"attacked_pct": 94.0, "longest_s": 4.7, "p90_gap_deg": 14}}, {"role": "attack", "label": "A-HFR · 60° wide", "file": "2024-04-04_xt32_60deg.pcap", "bytes": 10699500, "sha256": "8aef91d913acb36473f2d630ace218b46d2de28081c608e828cbe5e4fd58e152", "packets": 9402, "start": null, "duration": 3.8, "model": "XT32", "mode": "dual", "source": "2024-04-04 屋内車注入・A-HFR角度特性/2024-04-04_xt32_60deg.pcap", "zip": "ahfr-xt32-width/2024-04-04_xt32_60deg.zip", "zip_bytes": 4770817, "bev": "media/ahfr-xt32-width__2024-04-04-xt32-60deg__bev.mp4", "check": {"attacked_pct": 88.9, "longest_s": 3.2, "p90_gap_deg": 14}}], "cameras": []}, {"paper": "ndss25", "id": "ahfr-at128-highspeed", "group": "Removal", "title": "A-HFR against AT128 on a moving vehicle", "lidar": "AT128", "scene": "Test track, dynamic", "date": "2024-04-10", "note": "The AT128 rides on a vehicle driving past a pedestrian while the MVS system tracks it and fires A-HFR at 15 MHz (paper Table IX). This is the 60 km/h run used in the paper's detection analysis, together with the benign reference drive; the vehicle is stopped for the first few seconds.", "caps": [{"role": "benign", "label": "Benign drive", "file": "benign.pcap", "bytes": 392583225, "sha256": "227d154b3b13c1280114bc2c36bc66a4879fa4599058eadc0436a748a93365dc", "packets": 332375, "start": null, "duration": 54.4, "model": "AT128", "mode": "dual", "source": "Adaptive HFR moving vehicle/benign.pcap", "zip": "ahfr-at128-highspeed/benign.zip", "zip_bytes": 151781001, "bev": "media/ahfr-at128-highspeed__benign__bev.mp4", "check": {"attacked_pct": 0.0, "longest_s": 0.0, "p90_gap_deg": 0}}, {"role": "attack", "label": "A-HFR · 60 km/h", "file": "at128_20240410_60_3.pcap", "bytes": 161171663, "sha256": "81032bf1867d92fb69a26ff609756ce34b489625ca0083b8f1eb17665b93a0ce", "packets": 136412, "start": null, "duration": 22.2, "model": "AT128", "mode": "dual", "source": "2024-04-10-K2/at128_20240410_60_3.pcap", "zip": "ahfr-at128-highspeed/at128_20240410_60_3.zip", "zip_bytes": 64945937, "bev": "media/ahfr-at128-highspeed__at128-20240410-60-3__bev.mp4", "check": {"attacked_pct": 0.0, "longest_s": 0.0, "p90_gap_deg": 0}}], "cameras": []}], "nav": [{"label": "NDSS 2024 captures →", "href": "index.html"}, {"label": "SLAMSpoof (ICRA 2025) captures →", "href": "icra25.html"}]};
+const REPO = "https://github.com/Keio-CSG/lidar-spoofing-artifacts";
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); } for (const k of kids) if (k != null) e.append(k); return e; };
+const mb = b => (b / 1e6).toFixed(b < 1e7 ? 1 : 0) + " MB";
+const motion = s => /dynamic/i.test(s.scene) ? "dynamic" : "static";
+
+function toast(msg) { const t = el("div", { class: "toast", role: "status", text: msg }); document.body.append(t); setTimeout(() => t.remove(), 2600); }
+
+function stats() {
+  const caps = DATA.sets.flatMap(s => s.caps);
+  const bytes = caps.reduce((a, c) => a + c.bytes, 0);
+  const secs = caps.reduce((a, c) => a + c.duration, 0);
+  const items = [[DATA.sets.length, "experiments"], [caps.length, "pcap captures"], [caps.filter(c => c.role === "benign").length + " / " + caps.filter(c => c.role === "attack").length, "benign / attack"], [(bytes / 1e9).toFixed(2) + " GB", "raw pcap"], [Math.round(secs / 60) + " min", "of sensor data"]];
+  $("#stats").replaceChildren(...items.map(([v, l]) => el("div", {}, el("b", { text: String(v) }), l)));
+}
+
+function videoEl(src) {
+  const v = el("video", { src, muted: "", loop: "", playsinline: "", controls: "", preload: "metadata", poster: src.replace(/\.mp4$/, ".jpg") });
+  v.muted = true; return v;
+}
+
+function capCard(c, s) {
+  const card = el("article", { class: "cap " + c.role });
+  const screen = el("div", { class: "screen" });
+  const views = [];
+  if (c.video) views.push(["Recorded (VeloView)", c.video]);
+  views.push(["Rendered from pcap", c.bev]);
+  let v = videoEl(views[0][1]); screen.append(v);
+  card.append(screen);
+  if (views.length > 1) {
+    const bar = el("div", { class: "views", role: "group", "aria-label": "Video source" });
+    views.forEach(([lab, src], i) => {
+      const b = el("button", { type: "button", "aria-pressed": String(i === 0), text: lab });
+      b.onclick = () => { const playing = !v.paused; const nv = videoEl(src); v.replaceWith(nv); v = nv; card._video = () => v; bar.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); if (playing) nv.play().catch(() => {}); };
+      bar.append(b);
+    });
+    card.append(bar);
+  }
+  card._video = () => v;
+  const dl = el("dl", { class: "kv" });
+  for (const [k, val] of [["LiDAR", c.model + " · " + c.mode + " return"], ["Recorded", c.start || s.date + " (sensor clock, no wall time)"], ["Length", c.duration.toFixed(1) + " s · " + c.packets.toLocaleString() + " packets"], ["Size", mb(c.bytes) + " pcap · " + mb(c.zip_bytes) + " zip"],
+    ...(c.check ? [["Removal check", c.check.attacked_pct + "% of frames with a ≥8° gap · longest " + c.check.longest_s + " s"]] : [])]) dl.append(el("dt", { text: k }), el("dd", { text: val }));
+  const file = el("div", { class: "file" }, el("code", { text: c.file }));
+  const a = el("a", { class: "btn primary", text: "Download pcap" });
+  if (REPO) { a.href = REPO + "/releases/download/" + DATA.papers[s.paper].release + "/" + c.zip.split("/").pop(); a.target = "_blank"; a.rel = "noopener"; }
+  else { a.setAttribute("aria-disabled", "true"); a.setAttribute("role", "link"); a.title = "The pcap archive is being uploaded to a public data host"; a.onclick = e => { e.preventDefault(); toast("Downloads open once the archive is on its public host."); }; a.tabIndex = 0; }
+  const cp = el("button", { class: "btn", type: "button", text: "Copy SHA-256" });
+  cp.onclick = () => navigator.clipboard.writeText(c.sha256).then(() => toast("SHA-256 copied"), () => toast("Copy blocked — select the hash below instead"));
+  file.append(a, cp);
+  card.append(el("div", { class: "cap-body" },
+    el("div", { class: "cap-title" }, el("span", { class: "pill " + c.role, text: c.role }), el("h3", { text: c.label })),
+    dl, file,
+    el("div", { class: "hash", text: "sha256 " + c.sha256 }),
+    c.video_source ? el("div", { class: "src", text: "Recording: " + c.video_source }) : null));
+  return card;
+}
+
+function cameraCard(cam, aligned) {
+  const card = el("article", { class: "cap camera" });
+  const screen = el("div", { class: "screen" }); const v = videoEl(cam.video); screen.append(v); card.append(screen);
+  card._video = () => v;
+  card.append(el("div", { class: "cap-body" },
+    el("div", { class: "cap-title" }, el("span", { class: "pill camera", text: "video" }), el("h3", { text: cam.label || "Scene camera" })),
+    el("div", { class: "src", text: "Source: " + cam.source + (aligned ? "" : " (not time-aligned to the captures)") })));
+  return card;
+}
+
+function render() {
+  const main = $("#sets");
+  for (const s of DATA.sets) {
+    const sec = el("section", { class: "set", id: s.id, "data-paper": s.paper, "data-group": s.group, "data-lidar": s.lidar, "data-motion": motion(s) });
+    const hasB = s.caps.some(c => c.role === "benign");
+    const sync = el("button", { class: "syncbtn", type: "button", text: "Play all together" });
+    sec.append(el("div", { class: "set-head" },
+      el("div", {}, el("h2", { text: s.title }),
+        el("div", { class: "meta" }, el("span", { class: "tag grp", text: DATA.papers[s.paper].short }), el("span", { class: "tag", text: s.group === "CPI" ? "Injection · CPI" : "Removal" }), el("span", { class: "tag", text: s.lidar }), el("span", { class: "tag", text: s.scene }), el("span", { class: "tag", text: s.date }), s.caps.length === 0 ? el("span", { class: "tag", text: "video only" }) : hasB ? null : el("span", { class: "tag", text: "attack only" }))),
+      sync));
+    sec.append(el("p", { class: "note", text: s.note }));
+    const grid = el("div", { class: "caps" });
+    const order = { benign: 0, attack: 1 };
+    const cards = [...s.caps].sort((a, b) => order[a.role] - order[b.role]).map(c => capCard(c, s));
+    (s.cameras || []).slice().reverse().forEach(cam => cards.unshift(cameraCard(cam, /starts two seconds/.test(s.note))));
+    grid.append(...cards); sec.append(grid);
+    sync.onclick = () => { const vs = cards.map(c => c._video()); const go = vs.some(v => v.paused); vs.forEach(v => { if (go) { v.currentTime = 0; v.play().catch(() => {}); } else v.pause(); }); sync.textContent = go ? "Pause all" : "Play all together"; };
+    main.append(sec);
+  }
+}
+
+const state = { paper: "all", group: "all", motion: "all", lidar: "all" };
+document.querySelectorAll("button.chip").forEach(b => b.onclick = () => {
+  state[b.dataset.f] = b.dataset.v;
+  document.querySelectorAll(`button.chip[data-f="${b.dataset.f}"]`).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  document.querySelectorAll("section.set").forEach(s => { s.hidden = !Object.entries(state).every(([k, v]) => v === "all" || s.dataset[k] === v); });
+});
+function papers() {
+  const used = new Set(DATA.sets.map(s => s.paper));
+  const ps = Object.entries(DATA.papers).filter(([k]) => used.has(k)).map(([, p]) => p);
+  const link = (href, text) => href ? [" · ", el("a", { href, target: "_blank", rel: "noopener", text })] : [];
+  $("#papers").replaceChildren(...ps.map(p => el("li", {}, el("span", { class: "ptag", text: p.short }), el("b", { text: p.title }),
+    ...link(p.url, /arxiv/.test(p.url || "") ? "arXiv" : "Project page"), ...link(p.code, "Code"))));
+  for (const n of DATA.nav || []) $("#papers").append(el("li", {}, el("a", { href: n.href, text: n.label })));
+  $("#eyebrow").textContent = "Keio University · Computing and Sensing Group · " + ps.map(p => p.short).join(" / ");
+  const models = [...new Set(DATA.sets.flatMap(s => s.caps.map(c => c.model)))];
+  $("#ledehead").textContent = "Packet captures (.pcap) from " + models.join(", ") + " LiDARs in the physical experiments behind " + (ps.length > 1 ? "these papers" : "this paper") + ", each paired with a video.";
+  // hide filters that cannot change anything on this page
+  document.querySelectorAll("nav.filters .fg").forEach(g => {
+    const f = g.querySelector("button.chip").dataset.f; const vals = new Set(DATA.sets.map(s => f === "motion" ? motion(s) : s[f]));
+    g.querySelectorAll("button.chip").forEach(b => { if (b.dataset.v !== "all" && !vals.has(b.dataset.v)) b.hidden = true; });
+    if (vals.size < 2) g.hidden = true;
+  });
+  if (!used.has("ndss24")) $("#setup").hidden = true;
+}
+papers(); stats(); render();
+</script>

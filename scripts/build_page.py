@@ -15,6 +15,12 @@ a = ap.parse_args()
 data = json.load(open(os.path.join(ROOT, "docs", "data.json"), encoding="utf-8"))
 if a.papers:
     keep = a.papers.split(","); data["sets"] = [x for x in data["sets"] if x["paper"] in keep]
+chk_path = os.path.join(ROOT, "docs", "attack_check.json")
+chk = json.load(open(chk_path, encoding="utf-8")) if os.path.exists(chk_path) else {}
+for x in data["sets"]:
+    for c in x["caps"]:
+        r = chk.get(c["file"][:-5])
+        if r: c["check"] = {k: r[k] for k in ("attacked_pct", "longest_s", "p90_gap_deg")}
 data["nav"] = [dict(label=n.split("=", 1)[0], href=n.split("=", 1)[1]) for n in a.nav]
 html = open(os.path.join(ROOT, "scripts", "page.template.html"), encoding="utf-8").read()
 if a.title: html = html.replace("<title>New-Gen LiDAR Spoofing Captures</title>", f"<title>{a.title}</title>", 1)

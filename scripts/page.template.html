@@ -159,6 +159,7 @@ figure.setup{margin:0}
         <li>Open Velodyne captures in <a href="https://www.paraview.org/veloview/" target="_blank" rel="noopener">VeloView</a> (or <code>velodyne_decoder</code>, ROS <code>velodyne_pointcloud</code>) and Hesai captures in PandarView or the Hesai LiDAR SDK. AT128 needs its angle-correction file, which is attached to the NDSS 2025 release. The LiDAR model and return mode below are read from the packets themselves.</li>
         <li>Bird’s-eye renderings are top-down views, 0.1 s per frame (one 600 rpm revolution), coloured by height. In dual-return captures only the first return of each pair is drawn. AT128 renderings ignore its fine per-channel angle offsets (under about 0.5°).</li>
         <li>Recorded videos are VeloView screen recordings made during the experiments; some were matched to their capture by timestamp.</li>
+        <li>“Removal check” (Hesai captures): share of 0.1 s frames with an azimuth gap of at least 8° where the scene normally returns points, and the longest run of such frames. Benign captures score 0 %. Attack runs in which the attack did not take effect are not published.</li>
       </ul>
     </div>
   </div>
@@ -216,7 +217,8 @@ function capCard(c, s) {
   }
   card._video = () => v;
   const dl = el("dl", { class: "kv" });
-  for (const [k, val] of [["LiDAR", c.model + " · " + c.mode + " return"], ["Recorded", c.start || s.date + " (sensor clock, no wall time)"], ["Length", c.duration.toFixed(1) + " s · " + c.packets.toLocaleString() + " packets"], ["Size", mb(c.bytes) + " pcap · " + mb(c.zip_bytes) + " zip"]]) dl.append(el("dt", { text: k }), el("dd", { text: val }));
+  for (const [k, val] of [["LiDAR", c.model + " · " + c.mode + " return"], ["Recorded", c.start || s.date + " (sensor clock, no wall time)"], ["Length", c.duration.toFixed(1) + " s · " + c.packets.toLocaleString() + " packets"], ["Size", mb(c.bytes) + " pcap · " + mb(c.zip_bytes) + " zip"],
+    ...(c.check ? [["Removal check", c.check.attacked_pct + "% of frames with a ≥8° gap · longest " + c.check.longest_s + " s"]] : [])]) dl.append(el("dt", { text: k }), el("dd", { text: val }));
   const file = el("div", { class: "file" }, el("code", { text: c.file }));
   const a = el("a", { class: "btn primary", text: "Download pcap" });
   if (REPO) { a.href = REPO + "/releases/download/" + DATA.papers[s.paper].release + "/" + c.zip.split("/").pop(); a.target = "_blank"; a.rel = "noopener"; }

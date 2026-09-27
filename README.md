@@ -6,9 +6,9 @@ Velodyne VLP-16 / VLP-32C and Hesai AT128 / XT32 packet captures (pcap) and vide
   Chosen Pattern Injection (CPI), the synchronized Physical Removal Attack (PRA) and High-Frequency Removal (HFR), in static and dynamic scenes
 - *On the Realism of LiDAR Spoofing Attacks against Autonomous Driving Vehicle at High Speed and Long Distance* (NDSS 2025) —
   injection against a vehicle-mounted VLP-32C driving past the Moving Vehicle Spoofing (MVS) system, and adaptive HFR (A-HFR)
-  against the pulse-fingerprinting Hesai AT128 / XT32, including an AT128 on a vehicle at 10–60 km/h
+  against the pulse-fingerprinting Hesai AT128 / XT32, including an AT128 on a vehicle at 60 km/h
 - *SLAMSpoof: Practical LiDAR Spoofing Attacks on Localization Systems Guided by Scan Matching Vulnerability Analysis* (ICRA 2025) —
-  removal and fake-wall injection on a VLP-16, plus videos of the physical attack on a moving WHILL (separate page: `docs/icra25.html`)
+  removal and fake-wall injection on a VLP-16, plus videos of the physical attack on a moving WHILL 
 
 Benign references are included where they were recorded.
 
@@ -31,13 +31,14 @@ release/                   one zip per pcap (not in git; attached to the GitHub 
 ```
 pip install numpy pillow imageio-ffmpeg
 python scripts/build.py                 # all experiments (or pass experiment ids)
-python scripts/build_page.py --repo https://github.com/Keio-CSG/lidar-spoofing-artifacts --ga G-QYEN5RGBVF --papers ndss24,ndss25 --nav "SLAMSpoof (ICRA 2025) captures →=icra25.html"
-python scripts/build_page.py --repo https://github.com/Keio-CSG/lidar-spoofing-artifacts --ga G-QYEN5RGBVF --papers icra25 --title "SLAMSpoof Captures" --out docs/icra25.html --nav "NDSS 2024 / 2025 captures →=index.html"
-                                        # --repo enables download links (<repo>/releases/download/<tag>/<file>.zip)
+sh scripts/build_pages.sh                # docs/index.html (NDSS'24), docs/ndss25.html, docs/icra25.html
+python scripts/attack_check.py           # removal check for Hesai captures -> docs/attack_check.json
 ```
 
 Each zip contains a single unmodified pcap; the SHA-256 on the site is that of the pcap.
 
 ## Downloads
 
-NDSS 2024 pcaps: [v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/v1.0). NDSS 2025 pcaps (and the AT128 angle-correction file): [ndss25-v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/ndss25-v1.0). ICRA 2025 pcaps: [icra25-v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/icra25-v1.0). Browse them with videos at https://keio-csg.github.io/lidar-spoofing-artifacts/.
+NDSS 2024 pcaps: [v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/v1.0). NDSS 2025 pcaps (and the AT128 angle-correction file): [ndss25-v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/ndss25-v1.0). ICRA 2025 pcaps: [icra25-v1.0 release](https://github.com/Keio-CSG/lidar-spoofing-artifacts/releases/tag/icra25-v1.0). Browse them with videos: [NDSS 2024](https://keio-csg.github.io/lidar-spoofing-artifacts/) · [NDSS 2025](https://keio-csg.github.io/lidar-spoofing-artifacts/ndss25.html) · [ICRA 2025](https://keio-csg.github.io/lidar-spoofing-artifacts/icra25.html).
+
+Attack runs in which the attack did not take effect are not published (see the note in `scripts/manifest.py`).
