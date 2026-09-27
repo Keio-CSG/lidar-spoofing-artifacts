@@ -50,7 +50,8 @@ h1 em{font-style:normal;color:var(--accent)}
 .papers li.other .ptag{background:var(--chip);color:var(--ink-2)}
 .papers li.other a{color:var(--ink);font-weight:500;text-decoration-color:var(--rule);text-underline-offset:3px}
 .papers li.other a:hover{color:var(--accent);text-decoration-color:currentColor}
-.papers .go{color:var(--accent);font-weight:500}
+.papers li.other a.go{color:var(--accent);font-weight:600;text-decoration:none;white-space:nowrap}
+.papers li.other a.go:hover{text-decoration:underline}
 .stats{display:flex;flex-wrap:wrap;gap:10px 28px;font:500 13px/1.3 var(--mono);color:var(--ink-2)}
 .stats b{display:block;font:700 26px/1.1 var(--display);font-stretch:80%;color:var(--ink)}
 
@@ -282,7 +283,7 @@ function papers() {
   for (const n of DATA.nav || []) {
     const p = DATA.papers[n.label];
     $("#papers").append(p
-      ? el("li", { class: "other" }, el("span", { class: "ptag", text: p.short }), el("a", { href: n.href, text: p.title }), el("span", { class: "go", text: " · captures →" }))
+      ? el("li", { class: "other" }, el("span", { class: "ptag", text: p.short }), el("a", { href: n.href, text: p.title }), " · ", el("a", { class: "go", href: n.href, text: "captures →" }))
       : el("li", {}, el("a", { href: n.href, text: n.label })));
   }
   $("#eyebrow").textContent = "Keio University · Computing and Sensing Group · " + ps.map(p => p.short).join(" / ");
